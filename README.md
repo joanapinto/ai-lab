@@ -6,7 +6,7 @@ A Python project that fetches news articles from NewsAPI and Hacker News, and su
 
 - Fetches news articles about artificial intelligence from NewsAPI and Hacker News.
 - Summarizes articles using OpenAI GPT (if API key is provided).
-- Simple command-line interface.
+- Simple command-line interface and Streamlit web app.
 
 ## Requirements
 
@@ -43,7 +43,22 @@ A Python project that fetches news articles from NewsAPI and Hacker News, and su
 
 ## Usage
 
-Run the main script:
+### Streamlit Web App
+
+To launch the web interface, run:
+```sh
+streamlit run app.py
+```
+
+- Enter your search topic in the input field (default: "Artificial Intelligence").
+- Click the "🔎 Search and summarize" button.
+- The app will fetch news articles and display their titles and links.
+- If an OpenAI API key is set, each article will be summarized using GPT and the summary will be shown below the article.
+- If no OpenAI API key is set, summaries will not be generated and a warning will be displayed.
+
+### Command-Line Script
+
+You can also run the script in the terminal:
 ```sh
 python news_gpt.py
 ```
@@ -51,6 +66,7 @@ Follow the prompts to choose the news source and view summaries.
 
 ## Project Structure
 
+- `app.py` — Streamlit web app for news summarization.
 - `news_gpt.py` — Main script for fetching and summarizing news.
 - `requirements.txt` — Python dependencies.
 - `.env` — (Not committed) Your API keys.
