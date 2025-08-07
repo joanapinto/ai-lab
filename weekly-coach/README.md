@@ -52,7 +52,6 @@ An AI-powered personal coach that helps you achieve your goals through personali
    ```
    Then edit `.env` and add your actual API keys:
    ```
-   NEWS_API_KEY=your_newsapi_key
    OPENAI_API_KEY=your_openai_key
    ```
 
