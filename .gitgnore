@@ -1,0 +1,37 @@
+# Virtual environment
+venv/
+
+# Environment variables
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Build/distribution
+dist/
+build/
+*.egg-info/
+
+# IDE/editor settings
+.vscode/
+
+# User data files (optional - remove if you want to track these)
+user_profile.json
+logs/
+*.json
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
