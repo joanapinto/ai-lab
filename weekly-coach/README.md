@@ -23,7 +23,6 @@ An AI-powered personal coach that helps you achieve your goals through personali
 ## 📋 Requirements
 
 - Python 3.10+
-- [NewsAPI](https://newsapi.org/) API key
 - [OpenAI](https://platform.openai.com/) API key
 - Streamlit
 
