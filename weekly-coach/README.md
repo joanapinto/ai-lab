@@ -142,6 +142,12 @@ weekly-coach/
 - "Please complete setup first" → Go through the setup process
 - API errors → Check your API keys and internet connection
 
+## 🦶 Next steps
+
+- The weekly plan should check what day is it before creating it _or ask the user when should be the start date. Right now, the generated weekly plan will always start on monday
+- The weekly plan that is currently on should be of easier access. Right now we have to go to the “History” tab
+- For daily check-in and weekly reflections there should be notifications that the user could set on “Settings”
+
 ## 🤝 Contributing
 
 This is a personal project, but suggestions and improvements are welcome!

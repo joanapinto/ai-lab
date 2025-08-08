@@ -12,7 +12,16 @@ def load_weekly_plans():
         return []
     try:
         with open(log_path, "r") as f:
-            return json.load(f)
+            data = json.load(f)
+            # Add formatted date to each entry
+            for entry in data:
+                if 'timestamp' in entry:
+                    try:
+                        dt = datetime.fromisoformat(entry['timestamp'].replace('Z', '+00:00'))
+                        entry['date'] = dt.strftime("%B %d, %Y at %I:%M %p")
+                    except:
+                        entry['date'] = "Unknown"
+            return data
     except json.JSONDecodeError:
         return []
 
@@ -22,7 +31,16 @@ def load_daily_checkins():
         return []
     try:
         with open(log_path, "r") as f:
-            return json.load(f)
+            data = json.load(f)
+            # Add formatted date to each entry
+            for entry in data:
+                if 'timestamp' in entry:
+                    try:
+                        dt = datetime.fromisoformat(entry['timestamp'].replace('Z', '+00:00'))
+                        entry['date'] = dt.strftime("%B %d, %Y at %I:%M %p")
+                    except:
+                        entry['date'] = "Unknown"
+            return data
     except json.JSONDecodeError:
         return []
 
@@ -32,7 +50,16 @@ def load_weekly_reflections():
         return []
     try:
         with open(log_path, "r") as f:
-            return json.load(f)
+            data = json.load(f)
+            # Add formatted date to each entry
+            for entry in data:
+                if 'timestamp' in entry:
+                    try:
+                        dt = datetime.fromisoformat(entry['timestamp'].replace('Z', '+00:00'))
+                        entry['date'] = dt.strftime("%B %d, %Y at %I:%M %p")
+                    except:
+                        entry['date'] = "Unknown"
+            return data
     except json.JSONDecodeError:
         return []
 

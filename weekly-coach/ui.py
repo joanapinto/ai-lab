@@ -170,7 +170,7 @@ def get_task_for_day(plan_text, day):
     ]
     
     lines = plan_text.splitlines()
-    for line in lines:
+    for i, line in enumerate(lines):
         line = line.strip()
         for pattern in patterns:
             if line.startswith(pattern):
@@ -178,7 +178,28 @@ def get_task_for_day(plan_text, day):
                 task = line.replace(pattern, "").strip()
                 # Remove any remaining markdown formatting
                 task = task.replace("**", "").replace("*", "")
-                return task if task else "Task found but no description"
+                
+                # If the task is empty, check the next lines for content
+                if not task:
+                    task_lines = []
+                    j = i + 1
+                    while j < len(lines):
+                        next_line = lines[j].strip()
+                        # Stop if we hit another day or section
+                        if (next_line.startswith("- **") or 
+                            next_line.startswith("###") or 
+                            next_line.startswith("---") or
+                            not next_line):
+                            break
+                        # Add non-empty lines to the task
+                        if next_line:
+                            task_lines.append(next_line.replace("**", "").replace("*", ""))
+                        j += 1
+                    
+                    if task_lines:
+                        task = " ".join(task_lines)
+                
+                return task if task else f"No specific task for {day}"
     
     return "Not found"
 

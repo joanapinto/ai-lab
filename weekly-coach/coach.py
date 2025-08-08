@@ -9,11 +9,11 @@ import re
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-if not OPENAI_API_KEY:
-    raise ValueError("OPENAI_API_KEY is not set. Please check your .env file.")
-
-# Initialize OpenAI client
-client = OpenAI(api_key=OPENAI_API_KEY)
+# Initialize OpenAI client only if API key is available
+if OPENAI_API_KEY:
+    client = OpenAI(api_key=OPENAI_API_KEY)
+else:
+    client = None
 
 # Load the user profile from file
 def load_user_profile():
@@ -81,6 +81,9 @@ def generate_weekly_plan(mood, availability, focus="None"):
     final_prompt = reflection_summary + prompt
 
     # GPT call
+    if not client:
+        raise ValueError("OpenAI API key not set. Please add your API key to the .env file.")
+    
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",  # or "gpt-4" if available
         messages=[
@@ -98,6 +101,9 @@ def generate_weekly_plan(mood, availability, focus="None"):
 # Save the plan to the logs
 def save_weekly_plan_to_log(inputs, plan, main_objective):
     log_path = "logs/weekly_plans.json"
+    
+    # Create logs directory if it doesn't exist
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
 
     entry = {
         "timestamp": datetime.now().isoformat(),
@@ -131,6 +137,9 @@ def generate_weekly_reflection(goal, motivation, deadline, last_week_plan, objec
         notes=notes
     )
 
+    if not client:
+        raise ValueError("OpenAI API key not set. Please add your API key to the .env file.")
+    
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -144,6 +153,9 @@ def generate_weekly_reflection(goal, motivation, deadline, last_week_plan, objec
 # Save the reflection to the logs
 def save_weekly_reflection_to_log(inputs, reflection):
     log_path = "logs/weekly_reflections.json"
+    
+    # Create logs directory if it doesn't exist
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
 
     entry = {
         "timestamp": datetime.now().isoformat(),
@@ -175,6 +187,9 @@ def regenerate_weekly_plan(goal, motivation, deadline, last_plan, objective_achi
         notes=notes
     )
 
+    if not client:
+        raise ValueError("OpenAI API key not set. Please add your API key to the .env file.")
+    
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -200,6 +215,9 @@ def daily_checkin(goal, motivation, weekly_plan, day, yesterday_task, yesterday_
         today_task=today_task
     )
 
+    if not client:
+        raise ValueError("OpenAI API key not set. Please add your API key to the .env file.")
+    
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -213,6 +231,9 @@ def daily_checkin(goal, motivation, weekly_plan, day, yesterday_task, yesterday_
 # Save daily checkin to logs
 def save_daily_checkin_to_log(inputs, response):
     log_path = "logs/daily_checkins.json"
+    
+    # Create logs directory if it doesn't exist
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
 
     entry = {
         "timestamp": datetime.now().isoformat(),
@@ -384,13 +405,35 @@ def extract_task_for_day(plan_text, day):
     ]
     
     lines = plan_text.splitlines()
-    for line in lines:
+    for i, line in enumerate(lines):
         line = line.strip()
         for pattern in patterns:
             if line.startswith(pattern):
+                # Get the task from the current line
                 task = line.replace(pattern, "").strip()
                 task = task.replace("**", "").replace("*", "")
-                return task if task else "Task found but no description"
+                
+                # If the task is empty, check the next lines for content
+                if not task:
+                    task_lines = []
+                    j = i + 1
+                    while j < len(lines):
+                        next_line = lines[j].strip()
+                        # Stop if we hit another day or section
+                        if (next_line.startswith("- **") or 
+                            next_line.startswith("###") or 
+                            next_line.startswith("---") or
+                            not next_line):
+                            break
+                        # Add non-empty lines to the task
+                        if next_line:
+                            task_lines.append(next_line.replace("**", "").replace("*", ""))
+                        j += 1
+                    
+                    if task_lines:
+                        task = " ".join(task_lines)
+                
+                return task if task else f"No specific task for {day}"
     
     return "Not found"
 

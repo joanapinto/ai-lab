@@ -46,21 +46,10 @@ def main():
             st.switch_page("pages/1_Setup.py")
         
         st.markdown("---")
-        st.markdown("### 📚 Quick Demo")
-        st.markdown("Want to see how it works? Check out the demo features:")
-        
-        demo_col1, demo_col2, demo_col3 = st.columns(3)
-        with demo_col1:
-            if st.button("📋 Sample Weekly Plan", use_container_width=True):
-                st.switch_page("pages/2_Sample_Plan.py")
-        
-        with demo_col2:
-            if st.button("🌤️ Sample Check-in", use_container_width=True):
-                st.switch_page("pages/3_Sample_Checkin.py")
-        
-        with demo_col3:
-            if st.button("📝 Sample Reflection", use_container_width=True):
-                st.switch_page("pages/4_Sample_Reflection.py")
+        st.markdown("### 📚 Want to see examples?")
+        st.markdown("Check out the Help & Tips page for sample demos and detailed guidance:")
+        if st.button("❓ Help & Tips", use_container_width=True):
+            st.switch_page("pages/8_Help.py")
     
     else:
         # User has completed setup - show main dashboard

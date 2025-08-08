@@ -23,9 +23,9 @@ build/
 .vscode/
 
 # User data files (keep these for backup purposes)
-# user_profile.json
-# logs/
-# *.json
+user_profile.json
+logs/
+*.json
 
 # OS generated files
 .DS_Store
