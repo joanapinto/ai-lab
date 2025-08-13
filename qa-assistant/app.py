@@ -78,7 +78,6 @@ with tab1:
                 st.success("✅ Project analyzed successfully!")
                 
                 # Display the response with better formatting
-                st.markdown("### 🎯 QA Strategy & Recommendations")
                 st.markdown(response)
         except Exception as e:
             st.error(f"❌ Error analyzing project: {str(e)}")
@@ -101,5 +100,4 @@ with tab2:
         else:
             with st.spinner("🤖 Analyzing your project and generating QA strategy..."):
                 response = generate_qa_suggestions(project_description)
-            st.markdown("### 🎯 QA Strategy & Recommendations")
             st.markdown(response)
