@@ -9,3 +9,5 @@ Include:
 
 User input:
 {project_description}
+
+Please provide a comprehensive testing strategy with specific test cases and Playwright code examples.

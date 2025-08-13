@@ -23,7 +23,7 @@ def generate_qa_suggestions(project_description):
     prompt = template.format(project_description=project_description)
 
     response = client.chat.completions.create(
-        model="gpt-4",  # Change to gpt-3.5-turbo if needed
+        model="gpt-3.5-turbo",  # Change to gpt-3.5-turbo if needed
         messages=[
             {"role": "system", "content": "You are a senior QA helping devs with test strategy."},
             {"role": "user", "content": prompt}
