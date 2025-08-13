@@ -34,18 +34,22 @@ st.set_page_config(page_title="AI QA Assistant", layout="centered")
 st.title("🧪 AI QA Assistant for Devs & Small Teams")
 st.markdown("Generate test strategies and Playwright code based on your project.")
 
-# Step 1 – Choose input method
-input_method = st.radio(
-    "How would you like to describe your project?",
-    ("GitHub/local folder", "Manual description"),
-    index=0
-)
+# Create tabs for different input methods
+tab1, tab2 = st.tabs(["📁 Upload Project", "✍️ Manual Description"])
 
 project_description = ""
 
-# Step 2 – Input form
-if input_method == "GitHub/local folder":
-    uploaded_zip = st.file_uploader("Upload your zipped project folder", type="zip")
+# Tab 1: Upload Project
+with tab1:
+    st.markdown("### 📁 Upload Your Project")
+    st.markdown("Upload a zipped version of your project folder to get AI-powered QA recommendations.")
+    
+    uploaded_zip = st.file_uploader(
+        "Choose a ZIP file", 
+        type="zip",
+        help="Upload a zipped version of your project folder"
+    )
+    
     if uploaded_zip is not None:
         try:
             with tempfile.TemporaryDirectory() as tmp_dir:
@@ -71,20 +75,31 @@ if input_method == "GitHub/local folder":
                 
                 repo_text = extract_repo_description(project_dir)
                 response = generate_qa_suggestions(repo_text)
-            st.success("Project analyzed!")
-            st.markdown(response)
+                st.success("✅ Project analyzed successfully!")
+                
+                # Display the response with better formatting
+                st.markdown("### 🎯 QA Strategy & Recommendations")
+                st.markdown(response)
         except Exception as e:
             st.error(f"❌ Error analyzing project: {str(e)}")
 
-elif input_method == "Manual description":
-    project_description = st.text_area("📝 Describe your project", placeholder="e.g. I'm building a React app with login and a dashboard.")
-
-# Step 3 – Generate suggestions
-if st.button("🚀 Generate QA Suggestions"):
-    if not project_description.strip():
-        st.warning("Please provide a valid project description first.")
-    else:
-        with st.spinner("Thinking..."):
-            response = generate_qa_suggestions(project_description)
-        st.markdown("### ✅ Suggestions")
-        st.markdown(response)
+# Tab 2: Manual Description
+with tab2:
+    st.markdown("### ✍️ Describe Your Project")
+    st.markdown("Provide a detailed description of your project to get tailored QA recommendations.")
+    
+    project_description = st.text_area(
+        "Project Description", 
+        placeholder="e.g. I'm building a React app with user authentication, a dashboard for data visualization, and API integration with external services. The app handles user registration, login, data upload, and real-time notifications.",
+        height=200,
+        help="Describe your project's features, technologies, and main functionality"
+    )
+    
+    if st.button("🚀 Generate QA Strategy", type="primary", use_container_width=True):
+        if not project_description.strip():
+            st.warning("⚠️ Please provide a project description first.")
+        else:
+            with st.spinner("🤖 Analyzing your project and generating QA strategy..."):
+                response = generate_qa_suggestions(project_description)
+            st.markdown("### 🎯 QA Strategy & Recommendations")
+            st.markdown(response)
