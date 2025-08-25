@@ -36,19 +36,25 @@ def main():
         st.write(f"Your goal: {user_profile.get('goal', 'Not set')}")
         
         # Navigation options
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns(2)
         
         with col1:
-            if st.button("📝 Daily Check-in", use_container_width=True):
-                st.switch_page("pages/daily_checkin.py")
+            col1a, col1b = st.columns(2)
+            with col1a:
+                if st.button("📝 Daily Check-in", use_container_width=True):
+                    st.switch_page("pages/daily_checkin.py")
+            with col1b:
+                if st.button("😊 Mood Tracker", use_container_width=True):
+                    st.switch_page("pages/mood_tracker.py")
         
         with col2:
-            if st.button("🤔 Reflection", use_container_width=True):
-                st.switch_page("pages/reflection.py")
-        
-        with col3:
-            if st.button("📊 History", use_container_width=True):
-                st.switch_page("pages/history.py")
+            col2a, col2b = st.columns(2)
+            with col2a:
+                if st.button("🤔 Reflection", use_container_width=True):
+                    st.switch_page("pages/reflection.py")
+            with col2b:
+                if st.button("📊 History", use_container_width=True):
+                    st.switch_page("pages/history.py")
 
 if __name__ == "__main__":
     main()
