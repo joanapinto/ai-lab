@@ -77,6 +77,14 @@ def main():
             with col2b:
                 if st.button("📊 History", use_container_width=True):
                     st.switch_page("pages/history.py")
+        
+        # Additional navigation row
+        col3, col4 = st.columns(2)
+        with col3:
+            if st.button("📖 Mood Journal", use_container_width=True):
+                st.switch_page("pages/mood_journal.py")
+        with col4:
+            st.write("")  # Empty space for balance
 
 if __name__ == "__main__":
     main()

@@ -90,6 +90,6 @@ if confirm_reset:
     if st.button("❌ Reset My Profile"):
         reset_user_profile()
         st.success("✅ Profile reset successfully. Redirecting...")
-        st.experimental_rerun()
+        st.rerun()
 else:
     st.warning("Tick the box above to enable the reset button.")

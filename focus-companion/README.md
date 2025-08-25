@@ -51,6 +51,29 @@ Comprehensive emotional wellness monitoring with persistent data storage:
   - Progress tracking
   - Historical trend analysis
 
+### 📖 **Mood Journal**
+Comprehensive journaling system for reviewing and analyzing your wellness journey:
+
+- **📚 Complete Entry History**
+  - All mood and check-in entries in one place
+  - Chronological organization by date
+  - Detailed entry cards with full context
+
+- **🔍 Advanced Filtering**
+  - Filter by date range, entry type, and mood
+  - Time period filters (7, 30, 90 days)
+  - Quick filter clearing and reset
+
+- **📊 Journal Statistics**
+  - Total entries and averages
+  - Most common moods and patterns
+  - Recent activity tracking
+
+- **📤 Export Capabilities**
+  - JSON export for data analysis
+  - CSV export for spreadsheet analysis
+  - Timestamped files for organization
+
 ### 🤔 **Weekly Reflections**
 Structured reflection system for continuous improvement:
 
@@ -130,6 +153,7 @@ focus-companion/
 │   ├── onboarding.py      # User profile setup
 │   ├── daily_checkin.py   # Time-based check-ins with persistence
 │   ├── mood_tracker.py    # Emotion tracking & analytics with persistence
+│   ├── mood_journal.py    # Comprehensive journaling system
 │   ├── reflection.py      # Weekly reflections
 │   └── history.py         # Progress history
 ├── data/                  # Data storage
