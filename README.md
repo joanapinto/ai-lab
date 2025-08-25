@@ -18,7 +18,11 @@ Built to keep myself accountable — might help you too.
 
 ### 🧪 [AI QA Assistant](https://github.com/joanapinto/ai-lab/tree/main/qa-assistant)
 A web app that turns your project idea or zipped repo into a tested prototype.
-It thinks through test strategy, generates case scenarios, and even provides Playwright test code .
+It thinks through test strategy, generates case scenarios, and even provides Playwright test code.
+
+### 🧠 [Focus Companion](https://github.com/joanapinto/ai-lab/tree/main/focus-companion)
+An AI-powered focus and wellness assistant that helps you track daily routines, monitor mood patterns, and achieve goals through intelligent time-based check-ins.  
+Built with persistent data storage, smart analytics, and personalized insights.
 
 ---
 
