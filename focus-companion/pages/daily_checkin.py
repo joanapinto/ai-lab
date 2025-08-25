@@ -10,7 +10,7 @@ current_file = Path(__file__)
 project_root = current_file.parent.parent
 sys.path.insert(0, str(project_root))
 
-from data.storage import save_user_profile, load_user_profile
+from data.storage import save_user_profile, load_user_profile, save_checkin_data
 
 st.set_page_config(page_title="Focus Companion - Daily Check-in", page_icon="📝")
 st.title("📝 Daily Check-in")
@@ -64,7 +64,8 @@ else:
                     "focus_today": focus_today,
                     "energy_level": energy_level
                 }
-                # Here you would save the check-in data
+                # Save the check-in data to persistent storage
+                save_checkin_data(checkin_data)
                 st.success("✅ Morning check-in saved successfully!")
                 st.balloons()
         
@@ -92,7 +93,8 @@ else:
                     "adjust_plan": adjust_plan,
                     "take_break": take_break
                 }
-                # Here you would save the check-in data
+                # Save the check-in data to persistent storage
+                save_checkin_data(checkin_data)
                 st.success("✅ Afternoon check-in saved successfully!")
                 st.balloons()
         
@@ -117,6 +119,7 @@ else:
                     "challenges": challenges,
                     "current_feeling": current_feeling
                 }
-                # Here you would save the check-in data
+                # Save the check-in data to persistent storage
+                save_checkin_data(checkin_data)
                 st.success("✅ Evening check-in saved successfully!")
                 st.balloons()

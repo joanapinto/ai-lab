@@ -13,7 +13,7 @@ current_file = Path(__file__)
 project_root = current_file.parent.parent
 sys.path.insert(0, str(project_root))
 
-from data.storage import save_user_profile, load_user_profile
+from data.storage import save_user_profile, load_user_profile, save_mood_data, load_mood_data, save_all_mood_data, delete_mood_entry
 
 st.set_page_config(page_title="Focus Companion - Mood Tracker", page_icon="😊", layout="wide")
 st.title("😊 Mood Tracker")
@@ -26,12 +26,15 @@ if not user_profile:
     if st.button("🚀 Go to Onboarding", use_container_width=True):
         st.switch_page("pages/onboarding.py")
 else:
+    # Load existing mood data from persistent storage
+    mood_data = load_mood_data()
+    
     # Initialize session state for mood data
     if 'mood_data' not in st.session_state:
-        st.session_state.mood_data = []
-    
-    # Load existing mood data (in a real app, this would come from storage)
-    # For now, we'll use session state
+        st.session_state.mood_data = mood_data
+    else:
+        # Sync session state with persistent data
+        st.session_state.mood_data = mood_data
     
     # Sidebar for quick mood logging
     with st.sidebar:
@@ -56,6 +59,9 @@ else:
                 "date": datetime.now().strftime("%Y-%m-%d"),
                 "time": datetime.now().strftime("%H:%M")
             }
+            # Save to persistent storage
+            save_mood_data(new_mood)
+            # Update session state
             st.session_state.mood_data.append(new_mood)
             st.success("Mood logged! 📊")
             st.rerun()
@@ -154,6 +160,9 @@ else:
                 
                 # Add delete button
                 if st.button(f"🗑️ Delete", key=f"delete_{entry['timestamp']}"):
+                    # Remove from persistent storage
+                    delete_mood_entry(entry['timestamp'])
+                    # Remove from session state
                     st.session_state.mood_data.remove(entry)
                     st.rerun()
     else:

@@ -9,7 +9,10 @@ os.chdir(current_dir)
 sys.path.insert(0, str(current_dir))
 
 # Import the storage functions
-from data.storage import save_user_profile, load_user_profile, reset_user_profile
+from data.storage import save_user_profile, load_user_profile, reset_user_profile, load_mood_data, load_checkin_data
+
+# Import the assistant system
+from assistant.fallback import FallbackAssistant
 
 # Set page config
 st.set_page_config(
@@ -32,8 +35,27 @@ def main():
         if st.button("🚀 Start Onboarding", use_container_width=True):
             st.switch_page("pages/onboarding.py")
     else:
-        st.success("👋 Welcome back!")
-        st.write(f"Your goal: {user_profile.get('goal', 'Not set')}")
+        # Load user data for assistant
+        mood_data = load_mood_data()
+        checkin_data = load_checkin_data()
+        
+        # Initialize assistant
+        assistant = FallbackAssistant(user_profile, mood_data, checkin_data)
+        
+        # Personalized greeting
+        greeting = assistant.get_personalized_greeting()
+        st.success(greeting)
+        
+        # Show user goal
+        st.write(f"**Your goal:** {user_profile.get('goal', 'Not set')}")
+        
+        # Daily encouragement
+        encouragement = assistant.get_daily_encouragement()
+        st.info(encouragement)
+        
+        # Quick tip
+        tip = assistant.get_productivity_tip()
+        st.info(f"💡 **Today's Tip:** {tip}")
         
         # Navigation options
         col1, col2 = st.columns(2)
