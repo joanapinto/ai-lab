@@ -16,7 +16,16 @@ class FocusAssistant:
         self.mood_data = mood_data
         self.checkin_data = checkin_data
         self.user_goal = user_profile.get('goal', 'Improve focus and productivity')
-        self.user_tone = user_profile.get('tone', 'Gentle & supportive')
+        self.user_tone = user_profile.get('tone', 'Gentle & Supportive')
+        self.joy_sources = user_profile.get('joy_sources', [])
+        self.energy_drainers = user_profile.get('energy_drainers', [])
+        self.therapy_coaching = user_profile.get('therapy_coaching', 'No')
+        self.availability = user_profile.get('availability', '1–2 hours')
+        self.energy = user_profile.get('energy', 'Okay')
+        self.emotional_patterns = user_profile.get('emotional_patterns', 'Not sure yet')
+        self.small_habit = user_profile.get('small_habit', '')
+        self.reminders = user_profile.get('reminders', 'Yes')
+        self.situation = user_profile.get('situation', 'Freelancer')
     
     def get_morning_analysis_data(self, current_checkin: Dict) -> Dict:
         """Prepare data for morning check-in analysis"""
@@ -282,6 +291,248 @@ class FocusAssistant:
             tone_phrase = "Ready to help you focus"
         
         return f"{time_greeting}! {tone_phrase} on your goal: {self.user_goal}"
+    
+    def get_personalized_joy_suggestions(self) -> List[str]:
+        """Get personalized suggestions based on user's joy sources"""
+        suggestions = []
+        
+        for joy_source in self.joy_sources:
+            if joy_source == "Friends":
+                suggestions.append("👥 Connect with a friend or family member")
+            elif joy_source == "Movement":
+                suggestions.append("🏃‍♂️ Do some light exercise or stretching")
+            elif joy_source == "Creating":
+                suggestions.append("🎨 Spend time on a creative project")
+            elif joy_source == "Helping others":
+                suggestions.append("🤝 Do something kind for someone else")
+            elif joy_source == "Nature":
+                suggestions.append("🌿 Spend time outdoors or with plants")
+            elif joy_source == "Rest":
+                suggestions.append("😌 Take a moment to rest and recharge")
+            elif joy_source == "Learning":
+                suggestions.append("📚 Read or learn something new")
+        
+        return suggestions
+    
+    def get_energy_drainer_avoidance_tips(self) -> List[str]:
+        """Get tips to avoid or manage energy drainers"""
+        tips = []
+        
+        for drainer in self.energy_drainers:
+            if drainer == "Overwhelm":
+                tips.append("📝 Break tasks into smaller, manageable steps")
+            elif drainer == "Lack of sleep":
+                tips.append("😴 Prioritize getting 7-9 hours of sleep")
+            elif drainer == "Isolation":
+                tips.append("👥 Reach out to someone for connection")
+            elif drainer == "Criticism":
+                tips.append("💙 Practice self-compassion and positive self-talk")
+            elif drainer == "Deadlines":
+                tips.append("⏰ Start tasks early to reduce deadline pressure")
+        
+        return tips
+    
+    def get_situation_specific_advice(self) -> str:
+        """Get advice specific to user's situation"""
+        situation_advice = {
+            "Freelancer": "💼 As a freelancer, consider setting clear work boundaries and regular breaks",
+            "New parent": "👶 Parenting is demanding - remember to take care of yourself too",
+            "PhD student": "🎓 Research can be isolating - try to connect with colleagues regularly",
+            "Full-time job": "🏢 Balance work demands with personal time and self-care",
+            "Unemployed": "💪 Use this time to build skills and maintain a positive routine"
+        }
+        
+        return situation_advice.get(self.situation, "🌟 Focus on what you can control and celebrate small wins")
+    
+    def get_small_habit_reminder(self) -> str:
+        """Get a reminder about the user's small habit goal"""
+        if self.small_habit and self.energy in ["Low", "Very low"]:
+            return f"🌱 Remember your small habit goal: {self.small_habit}. Even 5 minutes counts!"
+        return ""
+    
+    def generate_smart_task_plan(self, checkin_data: Dict, user_goals: str = None) -> Dict:
+        """Generate intelligent task planning based on user's current state and goals"""
+        current_hour = datetime.now().hour
+        time_period = checkin_data.get('time_period', 'morning')
+        
+        # Analyze current state
+        sleep_quality = checkin_data.get('sleep_quality', 'Good')
+        energy_level = checkin_data.get('energy_level', 'Good')
+        current_feeling = checkin_data.get('current_feeling', 'Good')
+        day_progress = checkin_data.get('day_progress', 'Good')
+        
+        # Get user's focus goal
+        focus_goal = checkin_data.get('focus_today', user_goals or self.user_goal)
+        
+        # Generate task plan based on time period and state
+        if time_period == 'morning':
+            return self._generate_morning_task_plan(sleep_quality, energy_level, focus_goal)
+        elif time_period == 'afternoon':
+            return self._generate_afternoon_task_plan(energy_level, day_progress, focus_goal)
+        else:  # evening
+            return self._generate_evening_task_plan(current_feeling, focus_goal)
+    
+    def _generate_morning_task_plan(self, sleep_quality: str, energy_level: str, focus_goal: str) -> Dict:
+        """Generate morning task plan based on sleep and energy"""
+        tasks = []
+        recommendations = []
+        
+        # Adjust based on sleep quality
+        if sleep_quality in ['Poor', 'Terrible']:
+            tasks.extend([
+                "🌅 Gentle morning routine (10 min)",
+                "💧 Hydrate with water",
+                "🧘 Light stretching or meditation"
+            ])
+            recommendations.append("Start with gentle activities to build momentum")
+        elif sleep_quality in ['Excellent', 'Good']:
+            tasks.extend([
+                "🎯 Tackle your most important task first",
+                "📝 Review and prioritize today's goals",
+                "🏃‍♂️ Consider exercise if energy is high"
+            ])
+            recommendations.append("Great sleep! You're ready for focused work")
+        
+        # Adjust based on energy level
+        if energy_level in ['Low', 'Very low']:
+            tasks.extend([
+                "☕ Have a healthy breakfast",
+                "🚶‍♂️ Take a short walk outside",
+                "📚 Start with lighter, more enjoyable tasks"
+            ])
+            recommendations.append("Build energy gradually with nourishing activities")
+        elif energy_level in ['High', 'Good']:
+            tasks.extend([
+                "⚡ Use your high energy for complex tasks",
+                "🎯 Break down your main goal into 2-3 key actions",
+                "⏰ Set specific time blocks for focused work"
+            ])
+            recommendations.append("Perfect energy for productive deep work")
+        
+        # Add focus goal breakdown
+        if focus_goal:
+            tasks.append(f"🎯 Main focus: {focus_goal}")
+            tasks.append("📋 Break this into 3 smaller steps")
+        
+        # Add personalized joy-based activities
+        joy_suggestions = self.get_personalized_joy_suggestions()
+        if joy_suggestions:
+            tasks.append("💫 Energy boost: " + joy_suggestions[0])
+        
+        # Add small habit reminder if applicable
+        habit_reminder = self.get_small_habit_reminder()
+        if habit_reminder:
+            recommendations.append(habit_reminder)
+        
+        # Add situation-specific advice
+        situation_advice = self.get_situation_specific_advice()
+        if situation_advice:
+            recommendations.append(situation_advice)
+        
+        return {
+            "tasks": tasks,
+            "recommendations": recommendations,
+            "estimated_duration": self._estimate_task_duration(energy_level, sleep_quality),
+            "priority_order": "energy_based"
+        }
+    
+    def _generate_afternoon_task_plan(self, energy_level: str, day_progress: str, focus_goal: str) -> Dict:
+        """Generate afternoon task plan based on energy and progress"""
+        tasks = []
+        recommendations = []
+        
+        # Adjust based on day progress
+        if day_progress in ['Challenging', 'Difficult']:
+            tasks.extend([
+                "🔄 Review what's working and what's not",
+                "📝 Break down remaining tasks into smaller chunks",
+                "☕ Take a proper break to reset"
+            ])
+            recommendations.append("It's okay to adjust your approach")
+        elif day_progress in ['Great', 'Good']:
+            tasks.extend([
+                "🚀 Build on your momentum",
+                "🎯 Focus on your next priority",
+                "💡 Consider adding one more meaningful task"
+            ])
+            recommendations.append("Great progress! Keep the momentum going")
+        
+        # Adjust based on energy level
+        if energy_level in ['Low', 'Very low']:
+            tasks.extend([
+                "🍎 Have a healthy snack",
+                "🚶‍♂️ Take a 10-minute walk",
+                "📚 Switch to lighter, administrative tasks"
+            ])
+            recommendations.append("Focus on energy restoration and lighter tasks")
+        elif energy_level in ['High', 'Good']:
+            tasks.extend([
+                "⚡ Tackle your most challenging remaining task",
+                "🎯 Deep work session (45-90 minutes)",
+                "📊 Review and adjust your plan for the rest of the day"
+            ])
+            recommendations.append("Use your energy for focused, important work")
+        
+        # Add energy drainer avoidance tips
+        drainer_tips = self.get_energy_drainer_avoidance_tips()
+        if drainer_tips:
+            recommendations.append("💡 Avoid energy drainers: " + drainer_tips[0])
+        
+        # Add joy-based activity for energy boost
+        joy_suggestions = self.get_personalized_joy_suggestions()
+        if joy_suggestions and energy_level in ['Low', 'Very low']:
+            tasks.append("💫 Quick energy boost: " + joy_suggestions[0])
+        
+        return {
+            "tasks": tasks,
+            "recommendations": recommendations,
+            "estimated_duration": self._estimate_task_duration(energy_level, "Good"),
+            "priority_order": "progress_based"
+        }
+    
+    def _generate_evening_task_plan(self, current_feeling: str, focus_goal: str) -> Dict:
+        """Generate evening task plan based on current feeling"""
+        tasks = []
+        recommendations = []
+        
+        # Adjust based on current feeling
+        if current_feeling in ['Tired', 'Stressed']:
+            tasks.extend([
+                "🧘 Gentle evening routine",
+                "📖 Light reading or listening",
+                "🛁 Relaxing activity (bath, tea, etc.)"
+            ])
+            recommendations.append("Focus on rest and recovery")
+        elif current_feeling in ['Accomplished', 'Good']:
+            tasks.extend([
+                "📝 Reflect on today's wins",
+                "🎯 Plan tomorrow's priorities",
+                "🎉 Celebrate your accomplishments"
+            ])
+            recommendations.append("Great day! Plan for tomorrow's success")
+        
+        # Add preparation tasks
+        tasks.extend([
+            "🌙 Prepare for tomorrow",
+            "📋 Review tomorrow's schedule",
+            "😴 Wind down routine"
+        ])
+        
+        return {
+            "tasks": tasks,
+            "recommendations": recommendations,
+            "estimated_duration": "1-2 hours",
+            "priority_order": "wellness_based"
+        }
+    
+    def _estimate_task_duration(self, energy_level: str, sleep_quality: str) -> str:
+        """Estimate task duration based on energy and sleep"""
+        if energy_level in ['High', 'Good'] and sleep_quality in ['Excellent', 'Good']:
+            return "4-6 hours of focused work"
+        elif energy_level in ['Moderate']:
+            return "3-4 hours of moderate work"
+        else:
+            return "2-3 hours of lighter tasks"
     
     # Private helper methods for specific analyses
     

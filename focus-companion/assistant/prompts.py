@@ -35,7 +35,7 @@ class PromptTemplates:
         Generate a personalized daily recommendation that:
         1. Acknowledges their current situation and energy level
         2. Provides specific, actionable advice
-        3. Maintains their preferred tone: {user_profile.get('tone', 'Gentle & supportive')}
+        3. Maintains their preferred tone: {user_profile.get('tone', 'Gentle & Supportive')}
         4. Supports their goal: {user_profile.get('goal', 'Improve focus')}
         5. Is encouraging and motivating
         
@@ -178,7 +178,7 @@ class PromptTemplates:
            - Recommend hydration and nutrition
            - Suggest movement or exercise ideas
         
-        Tone: {user_profile.get('tone', 'Gentle & supportive')}
+        Tone: {user_profile.get('tone', 'Gentle & Supportive')}
         Goal: {user_profile.get('goal', 'Improve focus and productivity')}
         
         Keep recommendations practical and actionable for the morning hours.
@@ -224,7 +224,7 @@ class PromptTemplates:
            - Celebrate progress made so far
            - Maintain momentum for rest of day
         
-        Tone: {user_profile.get('tone', 'Gentle & supportive')}
+        Tone: {user_profile.get('tone', 'Gentle & Supportive')}
         Goal: {user_profile.get('goal', 'Improve focus and productivity')}
         
         Focus on maintaining momentum and optimizing the remaining day.
@@ -270,7 +270,7 @@ class PromptTemplates:
            - Suggest areas for personal growth
            - Encourage self-compassion and kindness
         
-        Tone: {user_profile.get('tone', 'Gentle & supportive')}
+        Tone: {user_profile.get('tone', 'Gentle & Supportive')}
         Goal: {user_profile.get('goal', 'Improve focus and productivity')}
         
         Focus on reflection, processing, and preparation for rest and tomorrow.

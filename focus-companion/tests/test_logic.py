@@ -22,11 +22,19 @@ class TestFocusAssistant(unittest.TestCase):
         """Set up test environment"""
         self.user_profile = {
             "goal": "Improve focus and productivity",
+            "joy_sources": ["Friends", "Movement", "Learning"],
+            "joy_other": "",
+            "energy_drainers": ["Overwhelm", "Deadlines"],
+            "energy_drainer_other": "",
+            "therapy_coaching": "No",
             "availability": "2-4 hours",
             "energy": "Good",
-            "check_ins": "Yes",
-            "tone": "Gentle & supportive",
-            "situation": "Freelancer"
+            "emotional_patterns": "Not applicable",
+            "small_habit": "",
+            "reminders": "Yes",
+            "tone": "Gentle & Supportive",
+            "situation": "Freelancer",
+            "situation_other": ""
         }
         
         self.sample_mood_data = [
@@ -95,7 +103,14 @@ class TestFocusAssistant(unittest.TestCase):
     def test_initialization(self):
         """Test FocusAssistant initialization"""
         self.assertEqual(self.assistant.user_goal, "Improve focus and productivity")
-        self.assertEqual(self.assistant.user_tone, "Gentle & supportive")
+        self.assertEqual(self.assistant.user_tone, "Gentle & Supportive")
+        self.assertEqual(self.assistant.joy_sources, ["Friends", "Movement", "Learning"])
+        self.assertEqual(self.assistant.energy_drainers, ["Overwhelm", "Deadlines"])
+        self.assertEqual(self.assistant.therapy_coaching, "No")
+        self.assertEqual(self.assistant.availability, "2-4 hours")
+        self.assertEqual(self.assistant.energy, "Good")
+        self.assertEqual(self.assistant.reminders, "Yes")
+        self.assertEqual(self.assistant.situation, "Freelancer")
         self.assertEqual(len(self.assistant.mood_data), 3)
         self.assertEqual(len(self.assistant.checkin_data), 3)
     
@@ -516,6 +531,85 @@ class TestFocusAssistant(unittest.TestCase):
         # Check that insights are generated
         self.assertIsInstance(insights, list)
         self.assertGreater(len(insights), 0)
+    
+    def test_get_personalized_joy_suggestions(self):
+        """Test personalized joy suggestions"""
+        suggestions = self.assistant.get_personalized_joy_suggestions()
+        
+        # Check that suggestions are generated
+        self.assertIsInstance(suggestions, list)
+        self.assertGreater(len(suggestions), 0)
+        
+        # Check that suggestions match joy sources
+        self.assertIn("👥 Connect with a friend or family member", suggestions)  # Friends
+        self.assertIn("🏃‍♂️ Do some light exercise or stretching", suggestions)  # Movement
+        self.assertIn("📚 Read or learn something new", suggestions)  # Learning
+    
+    def test_get_energy_drainer_avoidance_tips(self):
+        """Test energy drainer avoidance tips"""
+        tips = self.assistant.get_energy_drainer_avoidance_tips()
+        
+        # Check that tips are generated
+        self.assertIsInstance(tips, list)
+        self.assertGreater(len(tips), 0)
+        
+        # Check that tips match energy drainers
+        self.assertIn("📝 Break tasks into smaller, manageable steps", tips)  # Overwhelm
+        self.assertIn("⏰ Start tasks early to reduce deadline pressure", tips)  # Deadlines
+    
+    def test_get_situation_specific_advice(self):
+        """Test situation-specific advice"""
+        advice = self.assistant.get_situation_specific_advice()
+        
+        # Check that advice is generated
+        self.assertIsInstance(advice, str)
+        self.assertGreater(len(advice), 0)
+        
+        # Check that advice is specific to freelancer situation
+        self.assertIn("freelancer", advice.lower())
+    
+    def test_get_small_habit_reminder(self):
+        """Test small habit reminder"""
+        # Test with low energy and small habit
+        self.assistant.energy = "Low"
+        self.assistant.small_habit = "journaling"
+        reminder = self.assistant.get_small_habit_reminder()
+        
+        # Check that reminder is generated for low energy
+        self.assertIsInstance(reminder, str)
+        self.assertGreater(len(reminder), 0)
+        self.assertIn("journaling", reminder)
+        
+        # Test with high energy (should return empty string)
+        self.assistant.energy = "High"
+        reminder = self.assistant.get_small_habit_reminder()
+        self.assertEqual(reminder, "")
+    
+    def test_generate_smart_task_plan_with_new_profile_data(self):
+        """Test smart task plan generation with new profile data"""
+        checkin_data = {
+            "time_period": "morning",
+            "sleep_quality": "Good",
+            "energy_level": "High",
+            "focus_today": "Complete project"
+        }
+        
+        task_plan = self.assistant.generate_smart_task_plan(checkin_data)
+        
+        # Check that task plan is generated
+        self.assertIsInstance(task_plan, dict)
+        self.assertIn("tasks", task_plan)
+        self.assertIn("recommendations", task_plan)
+        self.assertIn("estimated_duration", task_plan)
+        self.assertIn("priority_order", task_plan)
+        
+        # Check that tasks include personalized elements
+        tasks = task_plan["tasks"]
+        self.assertGreater(len(tasks), 0)
+        
+        # Check that recommendations include personalized elements
+        recommendations = task_plan["recommendations"]
+        self.assertGreater(len(recommendations), 0)
 
 
 if __name__ == '__main__':

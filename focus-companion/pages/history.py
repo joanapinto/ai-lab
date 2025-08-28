@@ -81,6 +81,22 @@ else:
             st.write(f"**Goal:** {user_profile.get('goal', 'Not set')}")
             st.write(f"**Availability:** {user_profile.get('availability', 'Not set')}")
             st.write(f"**Energy Level:** {user_profile.get('energy', 'Not set')}")
+            st.write(f"**Situation:** {user_profile.get('situation', 'Not set')}")
+            
+            # Display joy sources
+            joy_sources = user_profile.get('joy_sources', [])
+            if joy_sources:
+                st.write(f"**Joy Sources:** {', '.join(joy_sources)}")
+            
+            # Display energy drainers
+            energy_drainers = user_profile.get('energy_drainers', [])
+            if energy_drainers:
+                st.write(f"**Energy Drainers:** {', '.join(energy_drainers)}")
+            
+            # Display small habit if applicable
+            small_habit = user_profile.get('small_habit', '')
+            if small_habit:
+                st.write(f"**Small Habit Goal:** {small_habit}")
         
         with col2:
             st.subheader("📈 Activity Summary")

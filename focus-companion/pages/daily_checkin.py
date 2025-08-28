@@ -81,6 +81,14 @@ else:
     st.success(encouragement)
     
     with st.form("daily_checkin_form"):
+        # Ask user what they want to do
+        st.subheader("🤔 What would you like to do?")
+        checkin_mode = st.radio(
+            "Choose your check-in mode:",
+            ["📝 Just log my feelings", "🎯 Get help planning my day"],
+            help="Select 'Just log' for quick mood tracking, or 'Get help' for smart task planning"
+        )
+        
         # Morning flow (5 AM - 12 PM)
         if 5 <= current_hour < 12:
             # Get yesterday's evening check-in for context
@@ -153,6 +161,39 @@ else:
                 # Save the check-in data to persistent storage
                 save_checkin_data(checkin_data)
                 st.success("✅ Morning check-in saved successfully!")
+                
+                # Generate smart task plan if user requested help
+                if checkin_mode == "🎯 Get help planning my day":
+                    st.subheader("🎯 Your Smart Task Plan")
+                    
+                    # Generate task plan using assistant
+                    task_plan = assistant.generate_smart_task_plan(checkin_data, focus_today)
+                    
+                    # Display tasks
+                    st.write("**📋 Recommended Tasks:**")
+                    for i, task in enumerate(task_plan['tasks'], 1):
+                        st.write(f"{i}. {task}")
+                    
+                    # Display recommendations
+                    if task_plan['recommendations']:
+                        st.write("**💡 Smart Recommendations:**")
+                        for rec in task_plan['recommendations']:
+                            st.info(rec)
+                    
+                    # Display estimated duration
+                    st.write(f"**⏰ Estimated Duration:** {task_plan['estimated_duration']}")
+                    
+                    # Add task completion tracking
+                    st.write("**✅ Task Completion:**")
+                    task_completion = {}
+                    for task in task_plan['tasks']:
+                        task_completion[task] = st.checkbox(f"Complete: {task}")
+                    
+                    # Save task plan to user data
+                    checkin_data['task_plan'] = task_plan
+                    checkin_data['task_completion'] = task_completion
+                    save_checkin_data(checkin_data)
+                
                 st.balloons()
         
         # Afternoon flow (12 PM - 6 PM)
@@ -226,6 +267,39 @@ else:
                 # Save the check-in data to persistent storage
                 save_checkin_data(checkin_data)
                 st.success("✅ Afternoon check-in saved successfully!")
+                
+                # Generate smart task plan if user requested help
+                if checkin_mode == "🎯 Get help planning my day":
+                    st.subheader("🎯 Your Smart Afternoon Plan")
+                    
+                    # Generate task plan using assistant
+                    task_plan = assistant.generate_smart_task_plan(checkin_data)
+                    
+                    # Display tasks
+                    st.write("**📋 Recommended Tasks:**")
+                    for i, task in enumerate(task_plan['tasks'], 1):
+                        st.write(f"{i}. {task}")
+                    
+                    # Display recommendations
+                    if task_plan['recommendations']:
+                        st.write("**💡 Smart Recommendations:**")
+                        for rec in task_plan['recommendations']:
+                            st.info(rec)
+                    
+                    # Display estimated duration
+                    st.write(f"**⏰ Estimated Duration:** {task_plan['estimated_duration']}")
+                    
+                    # Add task completion tracking
+                    st.write("**✅ Task Completion:**")
+                    task_completion = {}
+                    for task in task_plan['tasks']:
+                        task_completion[task] = st.checkbox(f"Complete: {task}")
+                    
+                    # Save task plan to user data
+                    checkin_data['task_plan'] = task_plan
+                    checkin_data['task_completion'] = task_completion
+                    save_checkin_data(checkin_data)
+                
                 st.balloons()
         
         # Evening flow (6 PM - 5 AM)
@@ -304,4 +378,37 @@ else:
                 # Save the check-in data to persistent storage
                 save_checkin_data(checkin_data)
                 st.success("✅ Evening check-in saved successfully!")
+                
+                # Generate smart task plan if user requested help
+                if checkin_mode == "🎯 Get help planning my day":
+                    st.subheader("🌙 Your Smart Evening Plan")
+                    
+                    # Generate task plan using assistant
+                    task_plan = assistant.generate_smart_task_plan(checkin_data)
+                    
+                    # Display tasks
+                    st.write("**📋 Recommended Tasks:**")
+                    for i, task in enumerate(task_plan['tasks'], 1):
+                        st.write(f"{i}. {task}")
+                    
+                    # Display recommendations
+                    if task_plan['recommendations']:
+                        st.write("**💡 Smart Recommendations:**")
+                        for rec in task_plan['recommendations']:
+                            st.info(rec)
+                    
+                    # Display estimated duration
+                    st.write(f"**⏰ Estimated Duration:** {task_plan['estimated_duration']}")
+                    
+                    # Add task completion tracking
+                    st.write("**✅ Task Completion:**")
+                    task_completion = {}
+                    for task in task_plan['tasks']:
+                        task_completion[task] = st.checkbox(f"Complete: {task}")
+                    
+                    # Save task plan to user data
+                    checkin_data['task_plan'] = task_plan
+                    checkin_data['task_completion'] = task_completion
+                    save_checkin_data(checkin_data)
+                
                 st.balloons()
