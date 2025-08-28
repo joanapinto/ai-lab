@@ -16,8 +16,13 @@ sys.path.insert(0, str(project_root))
 from data.storage import load_user_profile, load_mood_data, load_checkin_data
 from assistant.logic import FocusAssistant
 from assistant.fallback import FallbackAssistant
+from auth import require_beta_access
 
 st.set_page_config(page_title="Focus Companion - History & Analytics", page_icon="📊", layout="wide")
+
+# Require beta access
+require_beta_access()
+
 st.title("📊 Your History & Analytics")
 
 # Load user profile and data

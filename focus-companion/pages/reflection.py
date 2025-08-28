@@ -10,8 +10,13 @@ project_root = current_file.parent.parent
 sys.path.insert(0, str(project_root))
 
 from data.storage import save_user_profile, load_user_profile
+from auth import require_beta_access
 
 st.set_page_config(page_title="Focus Companion - Reflection", page_icon="🤔")
+
+# Require beta access
+require_beta_access()
+
 st.title("🤔 Weekly Reflection")
 
 # Load user profile

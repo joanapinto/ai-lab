@@ -10,8 +10,13 @@ project_root = current_file.parent.parent
 sys.path.insert(0, str(project_root))
 
 from data.storage import save_user_profile, load_user_profile, reset_user_profile
+from auth import require_beta_access
 
 st.set_page_config(page_title="Focus Companion - Onboarding", page_icon="🧠")
+
+# Require beta access
+require_beta_access()
+
 st.title("🧠 Welcome to Your Focus Companion")
 
 # Load existing profile if available
@@ -198,7 +203,25 @@ if submitted:
     save_user_profile(user_profile)
     st.success("✅ Profile saved successfully!")
     st.balloons()
-    st.switch_page("pages/daily_checkin.py")
+    
+    # Feedback prompt after onboarding completion
+    st.write("---")
+    st.subheader("🎉 Welcome to Focus Companion!")
+    st.write("You're all set up! How was the onboarding experience?")
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("👍 Smooth & easy!", key="onboarding_good"):
+            st.success("Great! We're glad it was easy for you! 🙏")
+            st.switch_page("pages/daily_checkin.py")
+    with col2:
+        if st.button("🤔 Could be clearer", key="onboarding_ok"):
+            st.info("We'd love to improve it! [📝 Feedback Form](https://tally.so/r/mBr11Q)")
+            st.switch_page("pages/daily_checkin.py")
+    with col3:
+        if st.button("📝 Share detailed feedback", key="onboarding_detailed"):
+            st.markdown("**[📋 Open Feedback Form](https://tally.so/r/mBr11Q)**")
+            st.switch_page("pages/daily_checkin.py")
 
 # 🚨 Reset Button with Confirmation
 st.markdown("---")

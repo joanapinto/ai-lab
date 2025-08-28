@@ -97,6 +97,10 @@ Comprehensive tracking and visualization:
 - **Data export** functionality for personal analysis
 - **🧠 Intelligent Assistant** with personalized insights and recommendations
 - **🎯 Smart Recommendations** based on your patterns and preferences
+- **🤖 AI-Powered Greetings** with OpenAI integration for personalized responses
+- **🔐 Persistent Authentication** with "Remember me" functionality
+- **📊 Usage Tracking** with real-time AI usage statistics
+- **💬 Integrated Feedback System** for beta testing and improvements
 
 ## 🚀 Quick Start
 
@@ -149,10 +153,11 @@ Comprehensive tracking and visualization:
 ```
 focus-companion/
 ├── app.py                 # Main Streamlit application
+├── auth.py                # Beta access control & authentication
 ├── pages/                 # Application pages
-│   ├── onboarding.py      # User profile setup
-│   ├── daily_checkin.py   # Time-based check-ins with persistence
-│   ├── mood_tracker.py    # Emotion tracking & analytics with persistence
+│   ├── onboarding.py      # User profile setup with feedback
+│   ├── daily_checkin.py   # Time-based check-ins with AI task planning
+│   ├── mood_tracker.py    # Emotion tracking & analytics
 │   ├── mood_journal.py    # Comprehensive journaling system
 │   ├── reflection.py      # Weekly reflections
 │   └── history.py         # Progress history
@@ -160,14 +165,19 @@ focus-companion/
 │   ├── storage.py         # User profile & data management
 │   ├── user_profile.json  # User profile data
 │   ├── mood_data.json     # Persistent mood tracking data
-│   └── checkin_data.json  # Persistent daily check-in data
+│   ├── checkin_data.json  # Persistent daily check-in data
+│   ├── usage_tracking.json # AI usage tracking & limits
+│   └── user_session.json  # Persistent authentication sessions
 ├── assistant/             # AI assistant logic
 │   ├── logic.py           # Core assistant intelligence
+│   ├── ai_service.py      # OpenAI integration with usage limits
 │   ├── prompts.py         # AI prompt templates
-│   └── fallback.py        # Fallback intelligence system
+│   ├── fallback.py        # Fallback intelligence system
+│   └── usage_limiter.py   # Usage tracking & cost control
 ├── memory/                # Memory management
 ├── tests/                 # Test suite
 ├── requirements.txt       # Python dependencies
+├── AI_SETUP.md           # AI features setup guide
 └── README.md             # This file
 ```
 
@@ -176,9 +186,56 @@ focus-companion/
 - **Frontend**: Streamlit
 - **Data Visualization**: Plotly
 - **Data Processing**: Pandas
-- **AI Integration**: OpenAI (planned)
+- **AI Integration**: OpenAI (GPT-3.5-turbo)
 - **Data Storage**: JSON files with persistent storage (expandable to database)
 - **Data Persistence**: Automatic saving and loading of all user data
+- **Authentication**: Custom beta access control with persistent sessions
+- **Usage Tracking**: Local JSON-based usage monitoring and limits
+- **Feedback Integration**: Tally form integration for beta testing
+
+## 🤖 AI Features
+
+Focus Companion now includes AI-powered personalization using OpenAI's GPT-3.5-turbo:
+
+### **🎯 AI-Powered Greetings**
+- Personalized greetings based on your mood, energy, and recent patterns
+- Context-aware responses that consider your goals and preferences
+- Time-of-day awareness for relevant messaging
+
+### **💬 Daily Encouragement**
+- AI-generated motivational messages tailored to your situation
+- Incorporates your joy sources and energy patterns
+- Adapts to your preferred communication tone
+
+### **💡 Smart Productivity Tips**
+- Context-aware tips based on your energy drainers and situation
+- Personalized recommendations for your available time
+- Considers your recent mood patterns for relevant advice
+
+### **🔄 Graceful Fallback**
+- Seamless fallback to rule-based responses when AI is unavailable
+- No interruption to your experience
+- Consistent functionality regardless of AI availability
+
+### **🔒 Privacy & Security**
+- Minimal data sent to OpenAI (only essential context)
+- No personal data stored by OpenAI
+- Optional feature - works perfectly without AI
+
+### **💰 Cost Control & Usage Limits**
+- **Usage tracking** with daily and monthly limits
+- **Per-user limits** to prevent abuse and control costs
+- **Feature control** - can disable expensive AI features
+- **Transparent usage stats** - users can see their AI usage
+- **Predictable costs** - maximum $4/month for 5 beta testers
+
+### **📝 Beta Testing Features**
+- **Integrated feedback system** with Tally form integration
+- **Persistent authentication** - no need to re-enter email
+- **Usage statistics** - real-time tracking of AI usage
+- **Contextual feedback prompts** - collected at optimal moments
+
+For setup instructions, see [AI_SETUP.md](AI_SETUP.md).
 
 ## 📊 Data Structure
 
@@ -186,11 +243,34 @@ focus-companion/
 ```json
 {
   "goal": "Improve focus and productivity",
-  "availability": "2-4 hours",
+  "joy_sources": ["Friends", "Movement", "Creating"],
+  "energy_drainers": ["Overwhelm", "Lack of sleep"],
+  "therapy_coaching": "No",
+  "availability": "2–4 hours",
   "energy": "Good",
-  "check_ins": "Yes",
-  "tone": "Gentle & supportive",
+  "emotional_patterns": "Not sure yet",
+  "small_habit": "Daily meditation",
+  "reminders": "Yes",
+  "tone": "Gentle & Supportive",
   "situation": "Freelancer"
+}
+```
+
+### Usage Tracking
+```json
+{
+  "daily_usage": {"2024-01-15": 5},
+  "monthly_usage": {"2024-01": 45},
+  "user_usage": {
+    "user@example.com": {
+      "2024-01-15": 3,
+      "2024-01": 25
+    }
+  },
+  "last_reset": {
+    "daily": "2024-01-15",
+    "monthly": "2024-01"
+  }
 }
 ```
 
@@ -230,14 +310,16 @@ All daily check-ins are automatically saved to `data/checkin_data.json` and pers
 - [x] Progress history
 - [x] **Persistent data storage system** - All user data saved permanently
 
-### Phase 2: AI Enhancement 🚧
+### Phase 2: AI Enhancement ✅
 - [x] **🧠 Intelligent Assistant System** - Pattern analysis and personalized insights
 - [x] **📊 Smart Recommendations** - Data-driven suggestions based on user patterns
 - [x] **🎯 Personalized Greetings** - Time and context-aware interactions
 - [x] **💡 Fallback Intelligence** - Smart responses without external AI
-- [ ] OpenAI integration for advanced insights
-- [ ] Natural language processing for reflections
-- [ ] Predictive mood analysis
+- [x] **🤖 OpenAI Integration** - AI-powered personalized responses
+- [x] **💰 Usage Limits & Cost Control** - Predictable costs for beta testing
+- [x] **📊 Usage Tracking** - Real-time monitoring of AI usage
+- [x] **🔐 Enhanced Authentication** - Persistent sessions with "Remember me"
+- [x] **💬 Feedback Integration** - Tally form integration for beta testing
 
 ### Phase 3: Advanced Features 📋
 - [ ] Habit tracking integration

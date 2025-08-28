@@ -13,8 +13,13 @@ sys.path.insert(0, str(project_root))
 
 from data.storage import save_user_profile, load_user_profile, save_checkin_data, load_checkin_data, load_mood_data
 from assistant.fallback import FallbackAssistant
+from auth import require_beta_access
 
 st.set_page_config(page_title="Focus Companion - Daily Check-in", page_icon="📝")
+
+# Require beta access
+require_beta_access()
+
 st.title("📝 Daily Check-in")
 
 # Load user profile
@@ -161,6 +166,20 @@ else:
                 # Save the check-in data to persistent storage
                 save_checkin_data(checkin_data)
                 st.success("✅ Morning check-in saved successfully!")
+                
+                # Feedback prompt after successful check-in
+                st.write("---")
+                st.info("💬 **How was this check-in experience?**")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    if st.button("👍 Great!", key="feedback_good_morning"):
+                        st.success("Thanks! We're glad it's working well for you! 🙏")
+                with col2:
+                    if st.button("🤔 Could be better", key="feedback_ok_morning"):
+                        st.info("We'd love to hear your suggestions! [📝 Feedback Form](https://tally.so/r/mBr11Q)")
+                with col3:
+                    if st.button("📝 Share detailed feedback", key="feedback_detailed_morning"):
+                        st.markdown("**[📋 Open Feedback Form](https://tally.so/r/mBr11Q)**")
                 
                 # Generate smart task plan if user requested help
                 if checkin_mode == "🎯 Get help planning my day":

@@ -6,6 +6,7 @@ Provides intelligent responses when AI features are not available
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 import random
+from .ai_service import AIService
 
 class FallbackAssistant:
     """Fallback assistant that provides intelligent responses without AI"""
@@ -25,9 +26,29 @@ class FallbackAssistant:
         self.small_habit = user_profile.get('small_habit', '')
         self.reminders = user_profile.get('reminders', 'Yes')
         self.situation = user_profile.get('situation', 'Freelancer')
+        
+        # Initialize AI service
+        self.ai_service = AIService()
     
     def get_daily_encouragement(self) -> str:
         """Get a daily encouragement message"""
+        # Get user email from session state if available
+        user_email = None
+        try:
+            import streamlit as st
+            user_email = st.session_state.get('user_email')
+        except:
+            pass
+        
+        # Try AI first
+        ai_encouragement = self.ai_service.generate_daily_encouragement(
+            self.user_profile, self.mood_data, self.checkin_data, user_email
+        )
+        
+        if ai_encouragement:
+            return ai_encouragement
+        
+        # Fallback to rule-based encouragement
         current_hour = datetime.now().hour
         
         if 5 <= current_hour < 12:
@@ -52,7 +73,14 @@ class FallbackAssistant:
         return random.choice(messages)
     
     def get_mood_insight(self) -> str:
-        """Get a basic mood insight based on recent data"""
+        """Get a mood insight based on recent data"""
+        # Try AI first
+        ai_insight = self.ai_service.generate_mood_analysis(self.mood_data, self.user_goal)
+        
+        if ai_insight:
+            return ai_insight
+        
+        # Fallback to rule-based insight
         if not self.mood_data:
             return "💡 Start tracking your mood to discover patterns and insights!"
         
@@ -74,6 +102,23 @@ class FallbackAssistant:
     
     def get_productivity_tip(self) -> str:
         """Get a random productivity tip"""
+        # Get user email from session state if available
+        user_email = None
+        try:
+            import streamlit as st
+            user_email = st.session_state.get('user_email')
+        except:
+            pass
+        
+        # Try AI first
+        ai_tip = self.ai_service.generate_productivity_tip(
+            self.user_profile, self.mood_data, self.checkin_data, user_email
+        )
+        
+        if ai_tip:
+            return ai_tip
+        
+        # Fallback to rule-based tips
         tips = [
             "💡 Try the Pomodoro Technique: 25 minutes of focused work, then a 5-minute break",
             "💡 Eliminate distractions by putting your phone in another room",
@@ -135,6 +180,23 @@ class FallbackAssistant:
     
     def get_personalized_greeting(self) -> str:
         """Get a personalized greeting based on user preferences"""
+        # Get user email from session state if available
+        user_email = None
+        try:
+            import streamlit as st
+            user_email = st.session_state.get('user_email')
+        except:
+            pass
+        
+        # Try AI first
+        ai_greeting = self.ai_service.generate_personalized_greeting(
+            self.user_profile, self.mood_data, self.checkin_data, user_email
+        )
+        
+        if ai_greeting:
+            return ai_greeting
+        
+        # Fallback to rule-based greeting
         current_hour = datetime.now().hour
         
         if 5 <= current_hour < 12:

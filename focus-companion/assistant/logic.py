@@ -7,6 +7,7 @@ import json
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 import pandas as pd
+from .ai_service import AIService
 
 class FocusAssistant:
     """AI-powered assistant for focus and wellness insights"""
@@ -26,6 +27,9 @@ class FocusAssistant:
         self.small_habit = user_profile.get('small_habit', '')
         self.reminders = user_profile.get('reminders', 'Yes')
         self.situation = user_profile.get('situation', 'Freelancer')
+        
+        # Initialize AI service
+        self.ai_service = AIService()
     
     def get_morning_analysis_data(self, current_checkin: Dict) -> Dict:
         """Prepare data for morning check-in analysis"""
@@ -273,6 +277,15 @@ class FocusAssistant:
     
     def get_personalized_greeting(self) -> str:
         """Generate a personalized greeting based on user data and time"""
+        # Try AI first
+        ai_greeting = self.ai_service.generate_personalized_greeting(
+            self.user_profile, self.mood_data, self.checkin_data
+        )
+        
+        if ai_greeting:
+            return ai_greeting
+        
+        # Fallback to rule-based greeting
         current_hour = datetime.now().hour
         
         if 5 <= current_hour < 12:
