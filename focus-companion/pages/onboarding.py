@@ -19,6 +19,10 @@ require_beta_access()
 
 st.title("🧠 Welcome to Your Focus Companion")
 
+# Beta tester welcome message
+st.success("🎉 **Welcome to Focus Companion Beta!**")
+st.info("💡 **Pro Tip:** Take your time with these questions - they help the AI provide personalized insights!")
+
 # Load existing profile if available
 existing_profile = load_user_profile()
 is_returning_user = bool(existing_profile)
@@ -181,6 +185,9 @@ if situation == "Other":
 
 # Save button
 submitted = st.button("💾 Save & Continue", type="primary", use_container_width=True)
+
+# Helpful tip before submission
+st.info("💡 **What's next?** After saving, you'll be guided to start your first check-in and explore the app!")
 
 if submitted:
     user_profile = {

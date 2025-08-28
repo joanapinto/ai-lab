@@ -57,6 +57,42 @@ def main():
             Your feedback helps us make the app better for everyone! 🚀
             """)
         
+        # Beta tester guide
+        if st.button("📋 Beta Tester Guide", use_container_width=True):
+            st.markdown("""
+            ### 🚀 **Beta Tester Guide**
+            
+            **🎯 Quick Start:**
+            1. **Start with a morning check-in** - It's the heart of the app!
+            2. **Track your mood** - Build patterns and insights
+            3. **Try the AI features** - Personalized greetings and tips
+            4. **Explore weekly reflections** - Learn from your patterns
+            
+            **💡 Pro Tips:**
+            - **Be consistent** - Daily check-ins build the most valuable insights
+            - **Use the AI features** - They get smarter with your data
+            - **Don't worry about perfection** - Just log how you're feeling
+            - **Try different times** - Morning, afternoon, and evening check-ins
+            
+            **🤖 AI Features:**
+            - **Personalized greetings** - AI that knows your patterns
+            - **Smart task planning** - Based on your energy and goals
+            - **Usage limits** - 20 AI calls per day, 400 per month
+            - **Graceful fallback** - Works perfectly even without AI
+            
+            **⚠️ Beta Expectations:**
+            - This is a **beta version** - some things might change
+            - **AI features** have usage limits to control costs
+            - **Data is saved locally** - your privacy is protected
+            - **Updates** will add new features based on your feedback
+            
+            **🎁 Beta Perks:**
+            - **Early access** to new features
+            - **Direct influence** on development
+            - **Priority support** for issues
+            - **Exclusive insights** into the development process
+            """)
+        
         # Quick feedback options
         st.write("**Quick feedback:**")
         col1, col2 = st.columns(2)
@@ -68,10 +104,79 @@ def main():
                 st.info("We'd love to hear more details in the feedback form above! 📝")
     
     st.title("🧠 Focus Companion")
-    st.write("Welcome to your personal focus assistant!")
     
     # Check if user has completed onboarding
     user_profile = load_user_profile()
+    
+    # Beta tester welcome message
+    if user_profile:
+        # Check if this is a new user (first time seeing the welcome)
+        if "beta_welcome_shown" not in st.session_state:
+            st.session_state.beta_welcome_shown = True
+            
+            st.success("🎉 **Welcome to Focus Companion Beta!**")
+            
+            with st.expander("📋 Beta Tester Guide", expanded=True):
+                st.markdown("""
+                ### 🚀 **Welcome, Beta Tester!**
+                
+                You're among the first to try Focus Companion! Here's how to get the most value:
+                
+                **🎯 Quick Start:**
+                1. **Start with a morning check-in** - It's the heart of the app!
+                2. **Track your mood** - Build patterns and insights
+                3. **Try the AI features** - Personalized greetings and tips
+                4. **Explore weekly reflections** - Learn from your patterns
+                
+                **💡 Pro Tips:**
+                - **Be consistent** - Daily check-ins build the most valuable insights
+                - **Use the AI features** - They get smarter with your data
+                - **Don't worry about perfection** - Just log how you're feeling
+                - **Try different times** - Morning, afternoon, and evening check-ins
+                
+                **🤖 AI Features:**
+                - **Personalized greetings** - AI that knows your patterns
+                - **Smart task planning** - Based on your energy and goals
+                - **Usage limits** - 20 AI calls per day, 400 per month
+                - **Graceful fallback** - Works perfectly even without AI
+                
+                **📝 Feedback:**
+                - **Share your thoughts** - Use the feedback forms throughout the app
+                - **Report bugs** - Help us improve the experience
+                - **Suggest features** - Your input shapes the future!
+                
+                **⚠️ Beta Expectations:**
+                - This is a **beta version** - some things might change
+                - **AI features** have usage limits to control costs
+                - **Data is saved locally** - your privacy is protected
+                - **Updates** will add new features based on your feedback
+                
+                **🎁 Beta Perks:**
+                - **Early access** to new features
+                - **Direct influence** on development
+                - **Priority support** for issues
+                - **Exclusive insights** into the development process
+                """)
+                
+                # Quick action buttons
+                st.markdown("### 🚀 Ready to get started?")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    if st.button("📝 Start Morning Check-in", use_container_width=True, type="primary"):
+                        st.switch_page("pages/daily_checkin.py")
+                with col2:
+                    if st.button("😊 Track My Mood", use_container_width=True):
+                        st.switch_page("pages/mood_tracker.py")
+                with col3:
+                    if st.button("📊 View My History", use_container_width=True):
+                        st.switch_page("pages/history.py")
+                
+                st.markdown("---")
+                st.info("💡 **Tip:** You can always access this guide from the sidebar under 'Feedback'")
+        
+        st.write("Welcome to your personal focus assistant!")
+    else:
+        st.write("Welcome to your personal focus assistant!")
     
     if not user_profile:
         st.info("👋 First time here? Let's get you set up!")
