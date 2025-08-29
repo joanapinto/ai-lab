@@ -114,7 +114,7 @@ def analyze_weekly_patterns(checkins, moods):
     return analysis
 
 def generate_weekly_summary_prompt(user_profile, week_analysis, start_date, end_date):
-    """Generate a comprehensive prompt for AI weekly summary"""
+    """Generate a comprehensive prompt for AI weekly summary with structured questions"""
     
     # Calculate key metrics
     total_checkins = week_analysis['total_checkins']
@@ -157,42 +157,38 @@ def generate_weekly_summary_prompt(user_profile, week_analysis, start_date, end_
         all_intensities.extend(day_data['intensities'])
     avg_mood_intensity = sum(all_intensities) / len(all_intensities) if all_intensities else 5
     
-    # Build the prompt
+    # Build the structured prompt
     prompt = f"""
-You are a supportive, encouraging AI assistant analyzing a user's weekly wellness and productivity data. 
+You are a supportive wellness coach analyzing a user's weekly data to provide personalized insights.
 
 USER CONTEXT:
 - Goal: {user_profile.get('goal', 'Improve focus and productivity')}
-- Tone preference: {user_profile.get('tone', 'Friendly')}
+- Tone: {user_profile.get('tone', 'Friendly')}
 - Availability: {user_profile.get('availability', '2-4 hours')}
 
-WEEKLY DATA ANALYSIS ({start_date} to {end_date}):
-- Total check-ins: {total_checkins}
-- Total mood entries: {total_moods}
-- Most active day: {most_active_day}
-- Highest energy day: {highest_energy_day}
-- Most common mood: {most_common_mood}
-- Average mood intensity: {avg_mood_intensity:.1f}/10
-
-PATTERNS:
-- Check-in days: {', '.join(week_analysis['checkin_days']) if week_analysis['checkin_days'] else 'None'}
-- Time periods used: {dict(week_analysis['time_periods'])}
+WEEKLY DATA ({start_date} to {end_date}):
+- Check-ins: {total_checkins} | Mood entries: {total_moods}
+- Active days: {', '.join(set(week_analysis['checkin_days'])) if week_analysis['checkin_days'] else 'None'}
 - Energy patterns: {dict(week_analysis['energy_patterns'])}
 - Mood patterns: {dict(week_analysis['mood_patterns'])}
+- Accomplishments: {week_analysis['accomplishments']}
+- Challenges: {week_analysis['challenges']}
 
-ACCOMPLISHMENTS: {week_analysis['accomplishments']}
-CHALLENGES: {week_analysis['challenges']}
+TASK: Answer these 3-5 key questions based on their data:
 
-TASK: Generate a personalized weekly summary that:
-1. Celebrates their consistency and achievements
-2. Identifies positive patterns and trends
-3. Provides encouraging insights about their energy, mood, and productivity
-4. Offers gentle suggestions for improvement
-5. Motivates them to continue their wellness journey
+1. **What mood dominated your week?** (Analyze mood patterns, intensity trends, emotional consistency)
 
-FORMAT: Write a warm, conversational summary (2-3 paragraphs) that feels personal and encouraging. Include specific observations about their patterns and celebrate their wins, no matter how small.
+2. **What gave you energy most consistently?** (Identify energy patterns, successful activities, positive triggers)
 
-TONE: {user_profile.get('tone', 'Friendly')}, supportive, and motivating. Use their name if available and reference their specific goal.
+3. **What habits could help you next week?** (Suggest specific, actionable habits based on their patterns and goals)
+
+4. **What's one thing you should celebrate?** (Highlight their biggest win or progress, no matter how small)
+
+5. **What's one gentle improvement to consider?** (Suggest one specific, achievable improvement)
+
+FORMAT: Answer each question in 1-2 sentences. Be specific, encouraging, and actionable. Reference their actual data and patterns.
+
+TONE: {user_profile.get('tone', 'Friendly')}, supportive, and motivating.
 """
     
     return prompt
@@ -264,6 +260,9 @@ def main():
     st.write("---")
     st.subheader("🤖 Your AI-Generated Weekly Summary")
     
+    # Show GPT quota badge
+    display_gpt_quota_badge(user_email)
+    
     # Show loading state
     with st.spinner("Generating your personalized weekly insights..."):
         try:
@@ -278,7 +277,9 @@ def main():
             
             if summary:
                 st.success("✨ **Your Weekly Insights**")
-                st.write(summary)
+                
+                # Display structured summary
+                display_structured_summary(summary)
                 
                 # Record AI usage
                 ai_service.usage_limiter.record_api_call(
@@ -391,6 +392,51 @@ def main():
         if st.button("📊 View History", use_container_width=True):
             st.switch_page("pages/history.py")
 
+def display_structured_summary(summary):
+    """Display the AI summary in a structured format"""
+    
+    # Split the summary into sections based on numbered questions
+    lines = summary.strip().split('\n')
+    current_question = None
+    current_answer = []
+    
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+            
+        # Check if this is a new question (starts with number and **)
+        if line.startswith(('1.', '2.', '3.', '4.', '5.')) and '**' in line:
+            # Save previous question if exists
+            if current_question and current_answer:
+                display_question_answer(current_question, ' '.join(current_answer))
+            
+            # Start new question
+            current_question = line
+            current_answer = []
+        else:
+            # Add to current answer
+            current_answer.append(line)
+    
+    # Display the last question
+    if current_question and current_answer:
+        display_question_answer(current_question, ' '.join(current_answer))
+
+def display_question_answer(question, answer):
+    """Display a single question and answer with nice formatting"""
+    
+    # Extract question text
+    if '**' in question:
+        question_text = question.split('**')[1].split('**')[0]
+    else:
+        question_text = question
+    
+    # Create a nice card-like display
+    with st.container():
+        st.markdown(f"### {question_text}")
+        st.info(answer)
+        st.write("---")
+
 def generate_fallback_summary(week_analysis, user_profile):
     """Generate a rule-based summary when AI is unavailable"""
     
@@ -442,6 +488,46 @@ def generate_fallback_summary(week_analysis, user_profile):
     summary += "Keep up the great work on your wellness journey!"
     
     st.write(summary)
+
+def display_gpt_quota_badge(user_email):
+    """Display GPT quota usage badge"""
+    if not user_email:
+        return
+    
+    try:
+        from assistant.usage_limiter import UsageLimiter
+        usage_limiter = UsageLimiter()
+        
+        # Get user's current usage
+        user_usage = usage_limiter.db.get_user_api_usage(user_email, days=1)
+        daily_used = sum(user_usage["daily_usage"].values())
+        daily_limit = usage_limiter.user_daily_limit
+        
+        # Calculate usage percentage
+        usage_percentage = (daily_used / daily_limit) * 100
+        
+        # Determine badge color and message
+        if usage_percentage >= 80:
+            badge_color = "error"
+            message = f"⚠️ You've used {daily_used}/{daily_limit} AI insights today. Almost at your limit!"
+        elif usage_percentage >= 60:
+            badge_color = "warning"
+            message = f"📊 You've used {daily_used}/{daily_limit} AI insights today. Want more? Upgrade coming soon!"
+        else:
+            badge_color = "info"
+            message = f"🤖 You've used {daily_used}/{daily_limit} AI insights today. {daily_limit - daily_used} remaining!"
+        
+        # Display the badge
+        if badge_color == "error":
+            st.error(message)
+        elif badge_color == "warning":
+            st.warning(message)
+        else:
+            st.info(message)
+            
+    except Exception as e:
+        # Silently fail if there's an issue with usage tracking
+        pass
 
 if __name__ == "__main__":
     main() 

@@ -102,6 +102,14 @@ Comprehensive tracking and visualization:
 - **📊 Usage Tracking** with real-time AI usage statistics
 - **💬 Integrated Feedback System** for beta testing and improvements
 
+### ⚡ **AI Optimization & Performance**
+- **🧠 Smart Caching System** - Avoids redundant API calls for similar inputs
+- **📝 Token Optimization** - Efficient prompts that reduce costs and improve speed
+- **🔄 Cache Management** - Automatic expiration and cleanup of old cache entries
+- **📊 Performance Monitoring** - Track cache hit rates and API call savings
+- **🎯 Enhanced Dashboard** - Real-time progress tracking and mood summaries
+- **📈 Weekly Summary Automation** - AI-generated insights with intelligent prompts
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -165,6 +173,7 @@ focus-companion/
 │   ├── database.py        # SQLite database manager
 │   ├── storage.py         # Hybrid JSON/SQLite storage
 │   ├── migrate_to_sqlite.py # Data migration utility
+│   └── ai_cache.json       # AI response cache (auto-generated)
 │   ├── focus_companion.db # SQLite database (auto-generated)
 │   ├── user_profile.json  # User profile data (backup)
 │   ├── mood_data.json     # Persistent mood tracking data (backup)
@@ -175,6 +184,7 @@ focus-companion/
 │   ├── logic.py           # Core assistant intelligence
 │   ├── ai_service.py      # OpenAI integration with usage limits
 │   ├── prompts.py         # AI prompt templates
+│   ├── ai_cache.py        # Smart caching system
 │   ├── fallback.py        # Fallback intelligence system
 │   └── usage_limiter.py   # Usage tracking & cost control
 ├── memory/                # Memory management
@@ -245,6 +255,17 @@ Focus Companion now includes AI-powered personalization using OpenAI's GPT-3.5-t
 - **Easy migration** - Automatic migration from JSON to SQLite
 - **Backup compatibility** - JSON files maintained as backup
 - **Advanced queries** - Complex analytics and reporting capabilities
+- **Admin-only insights** - Database insights restricted to administrator during beta testing
+
+### **⚡ AI Optimization Features**
+- **Smart Caching System** - Avoids redundant API calls for similar inputs
+- **Token Optimization** - Efficient prompts that reduce costs and improve speed
+- **Cache Management** - Automatic expiration and cleanup of old cache entries
+- **Performance Monitoring** - Track cache hit rates and API call savings
+- **Enhanced Dashboard** - Real-time progress tracking and mood summaries
+- **Weekly Summary Automation** - AI-generated insights with intelligent prompts
+- **GPT Quota UI** - Real-time usage badges and limit notifications
+- **Structured Weekly Insights** - 5 key questions with personalized answers
 
 For setup instructions, see [AI_SETUP.md](AI_SETUP.md).
 

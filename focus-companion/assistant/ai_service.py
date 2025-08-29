@@ -11,6 +11,7 @@ import streamlit as st
 from dotenv import load_dotenv
 from .prompts import PromptTemplates
 from .usage_limiter import UsageLimiter
+from .ai_cache import ai_cache, PromptOptimizer
 
 # Load environment variables
 load_dotenv()
@@ -100,10 +101,14 @@ class AIService:
             'recent_checkins': recent_checkins
         }
         
-        prompt = PromptTemplates.daily_recommendation_prompt(user_profile, recent_data)
-        
-        # Add specific greeting instructions
-        prompt += "\n\nPlease respond with a warm, personalized greeting (1-2 sentences) that acknowledges their current situation and recent patterns. Keep it concise and natural."
+        # Check cache first
+        if user_email:
+            cached_response = ai_cache.get_cached_response("greeting", user_email, recent_data)
+            if cached_response:
+                return cached_response
+
+        # Use optimized prompt
+        prompt = PromptOptimizer.optimize_greeting_prompt(user_profile, recent_data)
         
         try:
             response = self.client.chat.completions.create(
@@ -117,6 +122,10 @@ class AIService:
             )
             
             result = response.choices[0].message.content.strip()
+            
+            # Cache the response
+            if user_email:
+                ai_cache.cache_response("greeting", user_email, recent_data, result)
             
             # Record the API call with detailed information
             tokens_used = response.usage.total_tokens if response.usage else None
@@ -401,43 +410,14 @@ class AIService:
             all_intensities.extend(day_data['intensities'])
         avg_mood_intensity = sum(all_intensities) / len(all_intensities) if all_intensities else 5
         
-        # Generate comprehensive prompt
-        prompt = f"""
-You are a supportive, encouraging AI assistant analyzing a user's weekly wellness and productivity data. 
+        # Check cache first
+        if user_email:
+            cached_response = ai_cache.get_cached_response("weekly_summary", user_email, week_analysis)
+            if cached_response:
+                return cached_response
 
-USER CONTEXT:
-- Goal: {user_profile.get('goal', 'Improve focus and productivity')}
-- Tone preference: {user_profile.get('tone', 'Friendly')}
-- Availability: {user_profile.get('availability', '2-4 hours')}
-
-WEEKLY DATA ANALYSIS:
-- Total check-ins: {total_checkins}
-- Total mood entries: {total_moods}
-- Most active day: {most_active_day}
-- Highest energy day: {highest_energy_day}
-- Most common mood: {most_common_mood}
-- Average mood intensity: {avg_mood_intensity:.1f}/10
-
-PATTERNS:
-- Check-in days: {', '.join(week_analysis['checkin_days']) if week_analysis['checkin_days'] else 'None'}
-- Time periods used: {dict(week_analysis['time_periods'])}
-- Energy patterns: {dict(week_analysis['energy_patterns'])}
-- Mood patterns: {dict(week_analysis['mood_patterns'])}
-
-ACCOMPLISHMENTS: {week_analysis['accomplishments']}
-CHALLENGES: {week_analysis['challenges']}
-
-TASK: Generate a personalized weekly summary that:
-1. Celebrates their consistency and achievements
-2. Identifies positive patterns and trends
-3. Provides encouraging insights about their energy, mood, and productivity
-4. Offers gentle suggestions for improvement
-5. Motivates them to continue their wellness journey
-
-FORMAT: Write a warm, conversational summary (2-3 paragraphs) that feels personal and encouraging. Include specific observations about their patterns and celebrate their wins, no matter how small.
-
-TONE: {user_profile.get('tone', 'Friendly')}, supportive, and motivating. Use their name if available and reference their specific goal.
-"""
+        # Use optimized prompt
+        prompt = PromptOptimizer.optimize_weekly_summary_prompt(user_profile, week_analysis)
 
         try:
             response = self.client.chat.completions.create(
@@ -450,6 +430,10 @@ TONE: {user_profile.get('tone', 'Friendly')}, supportive, and motivating. Use th
                 temperature=0.8
             )
             result = response.choices[0].message.content.strip()
+            
+            # Cache the response
+            if user_email:
+                ai_cache.cache_response("weekly_summary", user_email, week_analysis, result)
             
             # Record the API call with detailed information
             tokens_used = response.usage.total_tokens if response.usage else None

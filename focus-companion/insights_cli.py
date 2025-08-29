@@ -24,6 +24,18 @@ def main():
     
     args = parser.parse_args()
     
+    # Restrict access to admin email only
+    ADMIN_EMAIL = "joanapnpinto@gmail.com"
+    
+    # Check if user is trying to access insights
+    if args.user and args.user != ADMIN_EMAIL:
+        print("🔒 Access Restricted: Database insights are only available to administrators during beta testing.")
+        return
+    
+    if args.global_insights or args.costs or args.adoption:
+        print("🔒 Access Restricted: Global insights are only available to administrators during beta testing.")
+        return
+    
     insights = DatabaseInsights()
     
     print("🔍 Focus Companion Database Insights")

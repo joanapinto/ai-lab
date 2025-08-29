@@ -31,6 +31,14 @@ def main():
         st.error("Please log in to view insights")
         return
     
+    # Restrict access to admin email only
+    ADMIN_EMAIL = "joanapnpinto@gmail.com"
+    if user_email != ADMIN_EMAIL:
+        st.error("🔒 **Access Restricted**")
+        st.write("Database insights are only available to administrators during beta testing.")
+        st.write("If you need access to your personal data, please contact the development team.")
+        return
+    
     # Initialize insights
     insights = DatabaseInsights()
     

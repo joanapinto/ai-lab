@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import sys
+from datetime import datetime, timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -190,20 +191,138 @@ def main():
         # Initialize assistant
         assistant = FallbackAssistant(user_profile, mood_data, checkin_data)
         
-        # Personalized greeting
+        # Enhanced Dashboard Header
+        st.write("---")
+        st.subheader("🎯 Your Wellness Dashboard")
+        
+        # User goal and progress
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            st.write(f"**Your Goal:** {user_profile.get('goal', 'Not set')}")
+        with col2:
+            # Calculate weekly consistency
+            week_checkins = [c for c in checkin_data if (datetime.now() - datetime.fromisoformat(c['timestamp'])).days <= 7]
+            consistency = len(set([datetime.fromisoformat(c['timestamp']).date() for c in week_checkins])) / 7 * 100
+            st.metric("Weekly Consistency", f"{consistency:.0f}%")
+        
+        # Personalized greeting with enhanced styling
         greeting = assistant.get_personalized_greeting()
-        st.success(greeting)
+        if greeting:
+            st.success(f"🤖 **AI Greeting:** {greeting}")
         
-        # Show user goal
-        st.write(f"**Your goal:** {user_profile.get('goal', 'Not set')}")
+        # GPT Quota Badge
+        display_gpt_quota_badge(user_email)
         
-        # Daily encouragement
-        encouragement = assistant.get_daily_encouragement()
-        st.info(encouragement)
+        # Mood and Energy Summary
+        st.write("---")
+        st.subheader("😊 How You've Been Feeling")
         
-        # Quick tip
-        tip = assistant.get_productivity_tip()
-        st.info(f"💡 **Today's Tip:** {tip}")
+        # Get recent mood data
+        recent_moods = mood_data[-5:] if mood_data else []
+        recent_checkins = checkin_data[-5:] if checkin_data else []
+        
+        if recent_moods or recent_checkins:
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                if recent_moods:
+                    avg_mood = sum(m.get('intensity', 5) for m in recent_moods) / len(recent_moods)
+                    st.metric("Average Mood", f"{avg_mood:.1f}/10")
+                    
+                    # Mood trend
+                    if len(recent_moods) >= 2:
+                        first_mood = recent_moods[0].get('intensity', 5)
+                        last_mood = recent_moods[-1].get('intensity', 5)
+                        trend = "↗️" if last_mood > first_mood else "↘️" if last_mood < first_mood else "→"
+                        st.write(f"**Trend:** {trend}")
+                else:
+                    st.info("No mood data yet")
+            
+            with col2:
+                if recent_checkins:
+                    energy_levels = [c.get('energy_level', 'Unknown') for c in recent_checkins if 'energy_level' in c]
+                    if energy_levels:
+                        most_common = max(set(energy_levels), key=energy_levels.count)
+                        st.metric("Most Common Energy", most_common)
+                        
+                        # Energy distribution
+                        high_energy = energy_levels.count('High') + energy_levels.count('Good')
+                        energy_percent = (high_energy / len(energy_levels)) * 100
+                        # Cap progress at 1.0 to avoid Streamlit error
+                        progress_value = min(energy_percent / 100, 1.0)
+                        st.progress(progress_value, text=f"{energy_percent:.0f}% High Energy")
+                else:
+                    st.info("No check-in data yet")
+            
+            with col3:
+                # Activity streak
+                if checkin_data:
+                    today = datetime.now().date()
+                    yesterday = today - timedelta(days=1)
+                    
+                    today_checkins = [c for c in checkin_data if datetime.fromisoformat(c['timestamp']).date() == today]
+                    yesterday_checkins = [c for c in checkin_data if datetime.fromisoformat(c['timestamp']).date() == yesterday]
+                    
+                    if today_checkins:
+                        st.success("✅ **Today:** Checked in")
+                    elif yesterday_checkins:
+                        st.warning("⚠️ **Today:** No check-in yet")
+                    else:
+                        st.info("📝 **Today:** Ready to start")
+                else:
+                    st.info("📝 Ready for your first check-in")
+        
+        # Daily encouragement and tips
+        st.write("---")
+        st.subheader("💡 Daily Insights")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            encouragement = assistant.get_daily_encouragement()
+            if encouragement:
+                st.info(f"💬 **Encouragement:** {encouragement}")
+        
+        with col2:
+            tip = assistant.get_productivity_tip()
+            if tip:
+                st.info(f"💡 **Today's Tip:** {tip}")
+        
+        # Quick Actions with Progress Indicators
+        st.write("---")
+        st.subheader("🚀 Quick Actions")
+        
+        # Calculate completion status for different features
+        today_checkins = [c for c in checkin_data if datetime.fromisoformat(c['timestamp']).date() == datetime.now().date()]
+        today_moods = [m for m in mood_data if datetime.fromisoformat(m['timestamp']).date() == datetime.now().date()]
+        
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            checkin_status = "✅ Complete" if today_checkins else "📝 Pending"
+            checkin_color = "success" if today_checkins else "info"
+            if st.button(f"📝 Daily Check-in\n{checkin_status}", use_container_width=True, type="primary" if not today_checkins else "secondary"):
+                st.switch_page("pages/daily_checkin.py")
+        
+        with col2:
+            mood_status = "✅ Complete" if today_moods else "😊 Pending"
+            mood_color = "success" if today_moods else "info"
+            if st.button(f"😊 Track Mood\n{mood_status}", use_container_width=True, type="primary" if not today_moods else "secondary"):
+                st.switch_page("pages/mood_tracker.py")
+        
+        with col3:
+            if st.button("📊 Weekly Summary", use_container_width=True):
+                st.switch_page("pages/weekly_summary.py")
+        
+        with col4:
+            # Only show insights button for admin
+            ADMIN_EMAIL = "joanapnpinto@gmail.com"
+            if user_email == ADMIN_EMAIL:
+                if st.button("📈 View Insights", use_container_width=True):
+                    st.switch_page("pages/insights.py")
+            else:
+                # Show a placeholder or different button for non-admin users
+                st.button("📈 View Insights", use_container_width=True, disabled=True, help="Admin only during beta testing")
         
         # Show usage stats if user is logged in
         user_email = get_user_email()
@@ -240,13 +359,17 @@ def main():
                         user_daily = stats["user"]["daily_used"]
                         user_daily_limit = stats["user"]["daily_limit"]
                         st.metric("Your Daily Calls", f"{user_daily}/{user_daily_limit}")
-                        st.progress(user_daily / user_daily_limit)
+                        # Cap progress at 1.0 to avoid Streamlit error
+                        progress_value = min(user_daily / user_daily_limit, 1.0)
+                        st.progress(progress_value)
                     
                     with col2:
                         user_monthly = stats["user"]["monthly_used"]
                         user_monthly_limit = stats["user"]["monthly_limit"]
                         st.metric("Your Monthly Calls", f"{user_monthly}/{user_monthly_limit}")
-                        st.progress(user_monthly / user_monthly_limit)
+                        # Cap progress at 1.0 to avoid Streamlit error
+                        progress_value = min(user_monthly / user_monthly_limit, 1.0)
+                        st.progress(progress_value)
                     
                     with col3:
                         user_cost = stats["user"]["total_cost"]
@@ -267,44 +390,19 @@ def main():
                         st.warning("⚠️ You're approaching your daily AI usage limit!")
                     if user_monthly >= user_monthly_limit * 0.8:
                         st.warning("⚠️ You're approaching your monthly AI usage limit!")
+                    
+                    # Cache statistics
+                    try:
+                        from assistant.ai_cache import ai_cache
+                        cache_stats = ai_cache.get_cache_stats()
+                        if cache_stats['total_entries'] > 0:
+                            st.subheader("⚡ Cache Performance")
+                            st.info(f"**Cache hits:** {cache_stats['total_entries']} entries | **Size:** {cache_stats['cache_size_mb']:.2f} MB")
+                            st.write("💡 *Smart caching is reducing API calls and improving response times*")
+                    except Exception:
+                        pass  # Silently fail if cache not available
         
-        # Navigation options
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            col1a, col1b = st.columns(2)
-            with col1a:
-                if st.button("📝 Daily Check-in", use_container_width=True):
-                    st.switch_page("pages/daily_checkin.py")
-            with col1b:
-                if st.button("😊 Mood Tracker", use_container_width=True):
-                    st.switch_page("pages/mood_tracker.py")
-        
-        with col2:
-            col2a, col2b = st.columns(2)
-            with col2a:
-                if st.button("🤔 Reflection", use_container_width=True):
-                    st.switch_page("pages/reflection.py")
-            with col2b:
-                if st.button("📊 History", use_container_width=True):
-                    st.switch_page("pages/history.py")
-        
-        # Additional navigation row
-        col3, col4 = st.columns(2)
-        with col3:
-            if st.button("📖 Mood Journal", use_container_width=True):
-                st.switch_page("pages/mood_journal.py")
-        with col4:
-            if st.button("📈 Insights", use_container_width=True):
-                st.switch_page("pages/insights.py")
-        
-        # Additional navigation row
-        col5, col6 = st.columns(2)
-        with col5:
-            if st.button("📊 Weekly Summary", use_container_width=True):
-                st.switch_page("pages/weekly_summary.py")
-        with col6:
-            st.write("")  # Empty space for balance
+
         
         # Feedback section on main dashboard
         st.write("---")
@@ -330,6 +428,46 @@ def main():
             st.success("**Beta Tester Perks**")
             st.write("Early access to new features!")
             st.write("Direct influence on development!")
+
+def display_gpt_quota_badge(user_email):
+    """Display GPT quota usage badge"""
+    if not user_email:
+        return
+    
+    try:
+        from assistant.usage_limiter import UsageLimiter
+        usage_limiter = UsageLimiter()
+        
+        # Get user's current usage
+        user_usage = usage_limiter.db.get_user_api_usage(user_email, days=1)
+        daily_used = sum(user_usage["daily_usage"].values())
+        daily_limit = usage_limiter.user_daily_limit
+        
+        # Calculate usage percentage
+        usage_percentage = (daily_used / daily_limit) * 100
+        
+        # Determine badge color and message
+        if usage_percentage >= 80:
+            badge_color = "error"
+            message = f"⚠️ You've used {daily_used}/{daily_limit} AI insights today. Almost at your limit!"
+        elif usage_percentage >= 60:
+            badge_color = "warning"
+            message = f"📊 You've used {daily_used}/{daily_limit} AI insights today. Want more? Upgrade coming soon!"
+        else:
+            badge_color = "info"
+            message = f"🤖 You've used {daily_used}/{daily_limit} AI insights today. {daily_limit - daily_used} remaining!"
+        
+        # Display the badge
+        if badge_color == "error":
+            st.error(message)
+        elif badge_color == "warning":
+            st.warning(message)
+        else:
+            st.info(message)
+            
+    except Exception as e:
+        # Silently fail if there's an issue with usage tracking
+        pass
 
 if __name__ == "__main__":
     main()

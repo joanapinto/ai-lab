@@ -44,6 +44,9 @@ data/user_session.json
 data/focus_companion.db
 data/*_backup.json
 
+# AI Cache files
+data/ai_cache.json
+
 # Streamlit cache and temporary files
 .streamlit/
 
