@@ -41,6 +41,14 @@ def main():
         if st.button("🚪 Logout", use_container_width=True):
             logout()
         
+        # Admin insights access
+        user_email = get_user_email()
+        if user_email == "joanapnpinto@gmail.com":
+            st.write("---")
+            st.subheader("🔓 Admin Tools")
+            if st.button("📊 Database Insights", use_container_width=True):
+                st.switch_page("pages/insights.py")
+        
         # Feedback section
         st.write("---")
         st.subheader("💬 Feedback")
@@ -210,9 +218,6 @@ def main():
         if greeting:
             st.success(f"🤖 **AI Greeting:** {greeting}")
         
-        # GPT Quota Badge
-        display_gpt_quota_badge(user_email)
-        
         # Mood and Energy Summary
         st.write("---")
         st.subheader("😊 How You've Been Feeling")
@@ -315,18 +320,21 @@ def main():
                 st.switch_page("pages/weekly_summary.py")
         
         with col4:
-            # Only show insights button for admin
-            ADMIN_EMAIL = "joanapnpinto@gmail.com"
-            if user_email == ADMIN_EMAIL:
-                if st.button("📈 View Insights", use_container_width=True):
-                    st.switch_page("pages/insights.py")
-            else:
-                # Show a placeholder or different button for non-admin users
-                st.button("📈 View Insights", use_container_width=True, disabled=True, help="Admin only during beta testing")
+            # Placeholder for insights button - will be populated after user_email is defined
+            st.button("📈 View Insights", use_container_width=True, disabled=True, help="Loading...")
         
         # Show usage stats if user is logged in
         user_email = get_user_email()
         if user_email:
+            # GPT Quota Badge
+            display_gpt_quota_badge(user_email)
+            
+            # Admin check for insights access
+            ADMIN_EMAIL = "joanapnpinto@gmail.com"
+            if user_email == ADMIN_EMAIL:
+                st.success("🔓 **Admin Access**: You can access Database Insights from the sidebar or navigation.")
+            else:
+                st.info("🔒 **Beta Testing**: Database Insights are admin-only during beta testing.")
             from assistant.usage_limiter import UsageLimiter
             usage_limiter = UsageLimiter()
             stats = usage_limiter.get_usage_stats(user_email)
