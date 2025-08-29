@@ -351,4 +351,119 @@ class AIService:
             
         except Exception as e:
             st.error(f"Error generating stress management advice: {str(e)}")
+            return None
+
+    def generate_weekly_summary(self, user_profile: Dict, week_analysis: Dict, user_email: str = None) -> str:
+        """Generate personalized weekly summary"""
+        # Check if we can use this feature
+        can_use, reason = self.can_use_feature("weekly_summary", user_email)
+        if not can_use:
+            st.warning(f"🤖 Weekly summary limited: {reason}")
+            return None
+
+        # Prepare comprehensive context for the AI
+        total_checkins = week_analysis['total_checkins']
+        total_moods = week_analysis['total_mood_entries']
+        
+        # Find most active day
+        day_counts = {}
+        for day in week_analysis['checkin_days']:
+            day_counts[day] = day_counts.get(day, 0) + 1
+        most_active_day = max(day_counts.items(), key=lambda x: x[1])[0] if day_counts else None
+        
+        # Find highest energy day
+        highest_energy_day = None
+        highest_energy = 0
+        for day, energies in week_analysis['energy_patterns'].items():
+            energy_scores = []
+            for energy in energies:
+                if energy == 'High': energy_scores.append(5)
+                elif energy == 'Good': energy_scores.append(4)
+                elif energy == 'Moderate': energy_scores.append(3)
+                elif energy == 'Low': energy_scores.append(2)
+                elif energy == 'Very low': energy_scores.append(1)
+            
+            if energy_scores:
+                avg_energy = sum(energy_scores) / len(energy_scores)
+                if avg_energy > highest_energy:
+                    highest_energy = avg_energy
+                    highest_energy_day = day
+        
+        # Find most common mood
+        all_moods = []
+        for day_data in week_analysis['mood_patterns'].values():
+            all_moods.extend(day_data['moods'])
+        most_common_mood = max(set(all_moods), key=all_moods.count) if all_moods else None
+        
+        # Calculate average mood intensity
+        all_intensities = []
+        for day_data in week_analysis['mood_patterns'].values():
+            all_intensities.extend(day_data['intensities'])
+        avg_mood_intensity = sum(all_intensities) / len(all_intensities) if all_intensities else 5
+        
+        # Generate comprehensive prompt
+        prompt = f"""
+You are a supportive, encouraging AI assistant analyzing a user's weekly wellness and productivity data. 
+
+USER CONTEXT:
+- Goal: {user_profile.get('goal', 'Improve focus and productivity')}
+- Tone preference: {user_profile.get('tone', 'Friendly')}
+- Availability: {user_profile.get('availability', '2-4 hours')}
+
+WEEKLY DATA ANALYSIS:
+- Total check-ins: {total_checkins}
+- Total mood entries: {total_moods}
+- Most active day: {most_active_day}
+- Highest energy day: {highest_energy_day}
+- Most common mood: {most_common_mood}
+- Average mood intensity: {avg_mood_intensity:.1f}/10
+
+PATTERNS:
+- Check-in days: {', '.join(week_analysis['checkin_days']) if week_analysis['checkin_days'] else 'None'}
+- Time periods used: {dict(week_analysis['time_periods'])}
+- Energy patterns: {dict(week_analysis['energy_patterns'])}
+- Mood patterns: {dict(week_analysis['mood_patterns'])}
+
+ACCOMPLISHMENTS: {week_analysis['accomplishments']}
+CHALLENGES: {week_analysis['challenges']}
+
+TASK: Generate a personalized weekly summary that:
+1. Celebrates their consistency and achievements
+2. Identifies positive patterns and trends
+3. Provides encouraging insights about their energy, mood, and productivity
+4. Offers gentle suggestions for improvement
+5. Motivates them to continue their wellness journey
+
+FORMAT: Write a warm, conversational summary (2-3 paragraphs) that feels personal and encouraging. Include specific observations about their patterns and celebrate their wins, no matter how small.
+
+TONE: {user_profile.get('tone', 'Friendly')}, supportive, and motivating. Use their name if available and reference their specific goal.
+"""
+
+        try:
+            response = self.client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a supportive wellness coach who celebrates progress and provides encouraging insights."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=400,
+                temperature=0.8
+            )
+            result = response.choices[0].message.content.strip()
+            
+            # Record the API call with detailed information
+            tokens_used = response.usage.total_tokens if response.usage else None
+            cost_usd = (tokens_used * 0.000002) if tokens_used else None  # GPT-3.5-turbo pricing
+            
+            self.usage_limiter.record_api_call(
+                user_email=user_email,
+                feature="weekly_summary",
+                tokens_used=tokens_used,
+                cost_usd=cost_usd
+            )
+            
+            return result
+            
+        except Exception as e:
+            st.error(f"Error generating weekly summary: {str(e)}")
             return None 

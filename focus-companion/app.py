@@ -298,6 +298,14 @@ def main():
             if st.button("📈 Insights", use_container_width=True):
                 st.switch_page("pages/insights.py")
         
+        # Additional navigation row
+        col5, col6 = st.columns(2)
+        with col5:
+            if st.button("📊 Weekly Summary", use_container_width=True):
+                st.switch_page("pages/weekly_summary.py")
+        with col6:
+            st.write("")  # Empty space for balance
+        
         # Feedback section on main dashboard
         st.write("---")
         st.subheader("💬 Help Us Improve Focus Companion")

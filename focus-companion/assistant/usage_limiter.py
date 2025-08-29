@@ -156,12 +156,13 @@ class UsageLimiter:
         """
         # Define which features are enabled for beta testing
         enabled_features = {
-            "greeting": True,
-            "encouragement": True,
-            "productivity_tip": True,
-            "mood_analysis": False,  # Disable expensive features
-            "focus_optimization": False,
-            "stress_management": False
+                                "greeting": True,
+                    "encouragement": True,
+                    "productivity_tip": True,
+                    "weekly_summary": True,  # Enable weekly summaries
+                    "mood_analysis": False,  # Disable expensive features
+                    "focus_optimization": False,
+                    "stress_management": False
         }
         
         return enabled_features.get(feature, False) 

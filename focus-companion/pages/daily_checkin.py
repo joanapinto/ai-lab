@@ -85,14 +85,103 @@ else:
     encouragement = assistant.get_daily_encouragement()
     st.success(encouragement)
     
+    # Initialize progress tracking in session state
+    if 'checkin_progress' not in st.session_state:
+        st.session_state.checkin_progress = 0
+    if 'checkin_steps_completed' not in st.session_state:
+        st.session_state.checkin_steps_completed = {
+            'basic_info': False,
+            'goals_energy': False,
+            'feelings_progress': False,
+            'complete': False
+        }
+    
+    # Progress tracking
+    st.write("---")
+    st.subheader("📊 Check-in Progress")
+    
+    # Reset progress button
+    col1, col2 = st.columns([3, 1])
+    with col2:
+        if st.button("🔄 Reset Progress", help="Start over with a fresh check-in"):
+            st.session_state.checkin_steps_completed = {
+                'basic_info': False,
+                'goals_energy': False,
+                'feelings_progress': False,
+                'complete': False
+            }
+            st.rerun()
+    
+    # Calculate progress based on completed steps
+    completed_steps = sum(st.session_state.checkin_steps_completed.values())
+    total_steps = len(st.session_state.checkin_steps_completed)
+    progress_percentage = (completed_steps / total_steps) * 100
+    
+    # Overall progress bar
+    progress_col1, progress_col2 = st.columns([3, 1])
+    with progress_col1:
+        progress_text = "Ready to start your check-in"
+        if progress_percentage > 0:
+            progress_text = f"Step {completed_steps} of {total_steps} completed"
+        if progress_percentage == 100:
+            progress_text = "Check-in complete! 🎉"
+        
+        st.progress(progress_percentage / 100, text=progress_text)
+    with progress_col2:
+        st.metric("Progress", f"{int(progress_percentage)}%")
+    
+    # Progress indicators for different sections
+    col1, col2, col3, col4 = st.columns(4)
+    
+    # Step 1: Basic Info
+    with col1:
+        if st.session_state.checkin_steps_completed['basic_info']:
+            st.success("✅ **Step 1:** Basic Info")
+            st.progress(1.0, text="Completed")
+        else:
+            st.info("📝 **Step 1:** Basic Info")
+            st.progress(0.0, text="Pending")
+    
+    # Step 2: Goals & Energy
+    with col2:
+        if st.session_state.checkin_steps_completed['goals_energy']:
+            st.success("✅ **Step 2:** Goals & Energy")
+            st.progress(1.0, text="Completed")
+        else:
+            st.info("🎯 **Step 2:** Goals & Energy")
+            st.progress(0.0, text="Pending")
+    
+    # Step 3: Feelings & Progress
+    with col3:
+        if st.session_state.checkin_steps_completed['feelings_progress']:
+            st.success("✅ **Step 3:** Feelings & Progress")
+            st.progress(1.0, text="Completed")
+        else:
+            st.info("💭 **Step 3:** Feelings & Progress")
+            st.progress(0.0, text="Pending")
+    
+    # Step 4: Complete
+    with col4:
+        if st.session_state.checkin_steps_completed['complete']:
+            st.success("✅ **Step 4:** Complete")
+            st.progress(1.0, text="Completed")
+        else:
+            st.info("✅ **Step 4:** Complete")
+            st.progress(0.0, text="Pending")
+    
     with st.form("daily_checkin_form"):
-        # Ask user what they want to do
-        st.subheader("🤔 What would you like to do?")
+        # Step 1: Basic Info
+        st.subheader("📝 Step 1: Choose Your Check-in Mode")
+        
         checkin_mode = st.radio(
-            "Choose your check-in mode:",
+            "What would you like to do?",
             ["📝 Just log my feelings", "🎯 Get help planning my day"],
             help="Select 'Just log' for quick mood tracking, or 'Get help' for smart task planning"
         )
+        
+        # Update progress when user selects mode
+        if checkin_mode:
+            st.session_state.checkin_steps_completed['basic_info'] = True
         
         # Morning flow (5 AM - 12 PM)
         if 5 <= current_hour < 12:
@@ -112,6 +201,9 @@ else:
             if yesterday_evening:
                 st.info(f"📝 **Yesterday's evening:** You felt {yesterday_evening.get('current_feeling', 'N/A')} and accomplished: {yesterday_evening.get('accomplishments', 'N/A')[:50]}...")
             
+            # Step 2: Goals & Energy
+            st.subheader("🎯 Step 2: Goals & Energy")
+            
             # Time-aware sleep question
             if current_hour < 8:
                 sleep_context = "How did you sleep last night?"
@@ -122,6 +214,10 @@ else:
                 f"😴 {sleep_context}",
                 ["Excellent", "Good", "Okay", "Poor", "Terrible"]
             )
+            
+            # Update progress when user answers sleep question
+            if sleep_quality:
+                st.session_state.checkin_steps_completed['goals_energy'] = True
             
             # Suggest focus based on previous patterns
             focus_suggestion = ""
@@ -147,25 +243,61 @@ else:
                 ["High", "Good", "Moderate", "Low", "Very low"]
             )
             
+            # Update progress when user answers energy question
+            if energy_level:
+                st.session_state.checkin_steps_completed['feelings_progress'] = True
+            
             # Morning wellness reminder
             if energy_level in ["Low", "Very low"]:
                 st.warning("💡 **Tip:** Consider a short walk, stretching, or a healthy breakfast to boost your energy!")
             
+            # Step 3: Additional Context
+            st.subheader("💭 Step 3: Additional Context")
+            
+            # Optional notes field
+            additional_notes = st.text_area(
+                "📝 Any additional thoughts? (Optional)",
+                placeholder="e.g., Feeling excited about today, Need to remember to call mom, Weather is affecting my mood",
+                help="Share any context that might help with your check-in"
+            )
+            
             submitted = st.form_submit_button("💾 Save Morning Check-in")
             
             if submitted:
+                # Mark check-in as complete
+                st.session_state.checkin_steps_completed['complete'] = True
+                
                 checkin_data = {
                     "timestamp": datetime.now().isoformat(),
                     "time_period": "morning",
                     "sleep_quality": sleep_quality,
                     "focus_today": focus_today,
                     "energy_level": energy_level,
+                    "additional_notes": additional_notes,
                     "day_of_week": day_of_week,
                     "checkin_hour": current_hour
                 }
                 # Save the check-in data to persistent storage
                 save_checkin_data(checkin_data)
                 st.success("✅ Morning check-in saved successfully!")
+                
+                # Completion celebration
+                if st.session_state.checkin_steps_completed['complete']:
+                    st.balloons()
+                    st.success("🎉 **Check-in Complete!** You've successfully completed all steps!")
+                    
+                    # Show completion summary
+                    st.write("---")
+                    st.subheader("📋 Check-in Summary")
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.write(f"**Time Period:** {time_period}")
+                        st.write(f"**Sleep Quality:** {sleep_quality}")
+                        st.write(f"**Energy Level:** {energy_level}")
+                    with col2:
+                        st.write(f"**Focus Today:** {focus_today[:50]}{'...' if len(focus_today) > 50 else ''}")
+                        if additional_notes:
+                            st.write(f"**Notes:** {additional_notes[:50]}{'...' if len(additional_notes) > 50 else ''}")
                 
                 # Feedback prompt after successful check-in
                 st.write("---")
@@ -231,6 +363,9 @@ else:
             if morning_checkin:
                 st.info(f"📝 **This morning:** You planned to focus on: {morning_checkin.get('focus_today', 'N/A')} and your energy was {morning_checkin.get('energy_level', 'N/A')}")
             
+            # Step 2: Goals & Energy
+            st.subheader("🎯 Step 2: Goals & Energy")
+            
             # Time-aware progress question
             if current_hour < 14:
                 progress_context = "How's your morning progress?"
@@ -243,6 +378,10 @@ else:
                 f"📊 {progress_context}",
                 ["Great", "Good", "Okay", "Challenging", "Difficult"]
             )
+            
+            # Update progress when user answers progress question
+            if day_progress:
+                st.session_state.checkin_steps_completed['goals_energy'] = True
             
             # Suggest plan adjustments based on progress
             if day_progress in ["Challenging", "Difficult"]:
@@ -265,27 +404,64 @@ else:
                 ["Yes, I need a break", "No, I'm in the zone", "Maybe later"]
             )
             
+            # Update progress when user answers break question
+            if take_break:
+                st.session_state.checkin_steps_completed['feelings_progress'] = True
+            
             # Break encouragement
             if take_break == "Yes, I need a break":
                 st.info("💡 **Great choice!** Taking breaks helps maintain focus and prevents burnout.")
             elif take_break == "No, I'm in the zone":
                 st.success("🚀 **Flow state!** Enjoy your productive momentum!")
             
+            # Step 3: Additional Context
+            st.subheader("💭 Step 3: Additional Context")
+            
+            # Optional notes field
+            additional_notes = st.text_area(
+                "📝 Any additional thoughts? (Optional)",
+                placeholder="e.g., Need to adjust my schedule, Feeling more focused now, Should take a walk",
+                help="Share any context that might help with your check-in"
+            )
+            
             submitted = st.form_submit_button("💾 Save Afternoon Check-in")
             
             if submitted:
+                # Mark check-in as complete
+                st.session_state.checkin_steps_completed['complete'] = True
+                
                 checkin_data = {
                     "timestamp": datetime.now().isoformat(),
                     "time_period": "afternoon",
                     "day_progress": day_progress,
                     "adjust_plan": adjust_plan,
                     "take_break": take_break,
+                    "additional_notes": additional_notes,
                     "day_of_week": day_of_week,
                     "checkin_hour": current_hour
                 }
                 # Save the check-in data to persistent storage
                 save_checkin_data(checkin_data)
                 st.success("✅ Afternoon check-in saved successfully!")
+                
+                # Completion celebration
+                if st.session_state.checkin_steps_completed['complete']:
+                    st.balloons()
+                    st.success("🎉 **Check-in Complete!** You've successfully completed all steps!")
+                    
+                    # Show completion summary
+                    st.write("---")
+                    st.subheader("📋 Check-in Summary")
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.write(f"**Time Period:** {time_period}")
+                        st.write(f"**Day Progress:** {day_progress}")
+                        st.write(f"**Break Decision:** {take_break}")
+                    with col2:
+                        if adjust_plan:
+                            st.write(f"**Plan Adjustment:** {adjust_plan[:50]}{'...' if len(adjust_plan) > 50 else ''}")
+                        if additional_notes:
+                            st.write(f"**Notes:** {additional_notes[:50]}{'...' if len(additional_notes) > 50 else ''}")
                 
                 # Generate smart task plan if user requested help
                 if checkin_mode == "🎯 Get help planning my day":
@@ -343,6 +519,9 @@ else:
                     journey_summary += f"• Afternoon was {afternoon_checkin.get('day_progress', 'N/A')}"
                 st.info(journey_summary)
             
+            # Step 2: Goals & Energy
+            st.subheader("🎯 Step 2: Goals & Energy")
+            
             # Time-aware accomplishment question
             if current_hour < 20:
                 accomplishment_context = "What did you accomplish today?"
@@ -354,6 +533,10 @@ else:
                 placeholder="e.g., Completed project proposal, Exercised for 30 minutes, Read 20 pages",
                 help="Celebrate your wins, no matter how small!"
             )
+            
+            # Update progress when user enters accomplishments
+            if accomplishments:
+                st.session_state.checkin_steps_completed['goals_energy'] = True
             
             challenges = st.text_area(
                 "🚧 Any challenges? (Optional)",
@@ -372,31 +555,71 @@ else:
                 ["Accomplished", "Good", "Okay", "Tired", "Stressed"]
             )
             
+            # Update progress when user answers feeling question
+            if current_feeling:
+                st.session_state.checkin_steps_completed['feelings_progress'] = True
+            
             # Evening wellness tips
             if current_feeling in ["Tired", "Stressed"]:
                 st.warning("💡 **Evening tip:** Consider a relaxing activity like reading, meditation, or gentle stretching to wind down.")
             elif current_feeling == "Accomplished":
                 st.success("🎉 **Great job today!** You should be proud of your accomplishments!")
             
+            # Step 3: Additional Context
+            st.subheader("💭 Step 3: Additional Context")
+            
             # Tomorrow preparation
             if current_hour < 22:
-                st.info("🌙 **Tomorrow prep:** Consider what you'd like to focus on tomorrow for a great start!")
+                tomorrow_focus = st.text_area(
+                    "🌙 What would you like to focus on tomorrow? (Optional)",
+                    placeholder="e.g., Continue with the project, Exercise in the morning, Call a friend",
+                    help="Planning ahead can help you start tomorrow with intention"
+                )
+            else:
+                tomorrow_focus = st.text_area(
+                    "🌙 Any thoughts for tomorrow? (Optional)",
+                    placeholder="e.g., Need to remember to..., Looking forward to..., Should prepare for...",
+                    help="Capture any thoughts before bed"
+                )
             
             submitted = st.form_submit_button("💾 Save Evening Check-in")
             
             if submitted:
+                # Mark check-in as complete
+                st.session_state.checkin_steps_completed['complete'] = True
+                
                 checkin_data = {
                     "timestamp": datetime.now().isoformat(),
                     "time_period": "evening",
                     "accomplishments": accomplishments,
                     "challenges": challenges,
                     "current_feeling": current_feeling,
+                    "tomorrow_focus": tomorrow_focus,
                     "day_of_week": day_of_week,
                     "checkin_hour": current_hour
                 }
                 # Save the check-in data to persistent storage
                 save_checkin_data(checkin_data)
                 st.success("✅ Evening check-in saved successfully!")
+                
+                # Completion celebration
+                if st.session_state.checkin_steps_completed['complete']:
+                    st.balloons()
+                    st.success("🎉 **Check-in Complete!** You've successfully completed all steps!")
+                    
+                    # Show completion summary
+                    st.write("---")
+                    st.subheader("📋 Check-in Summary")
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.write(f"**Time Period:** {time_period}")
+                        st.write(f"**Current Feeling:** {current_feeling}")
+                        st.write(f"**Accomplishments:** {accomplishments[:50]}{'...' if len(accomplishments) > 50 else ''}")
+                    with col2:
+                        if challenges:
+                            st.write(f"**Challenges:** {challenges[:50]}{'...' if len(challenges) > 50 else ''}")
+                        if tomorrow_focus:
+                            st.write(f"**Tomorrow's Focus:** {tomorrow_focus[:50]}{'...' if len(tomorrow_focus) > 50 else ''}")
                 
                 # Generate smart task plan if user requested help
                 if checkin_mode == "🎯 Get help planning my day":
