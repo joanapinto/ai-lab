@@ -301,7 +301,7 @@ def main():
         today_checkins = [c for c in checkin_data if datetime.fromisoformat(c['timestamp']).date() == datetime.now().date()]
         today_moods = [m for m in mood_data if datetime.fromisoformat(m['timestamp']).date() == datetime.now().date()]
         
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3, col4, col5 = st.columns(5)
         
         with col1:
             checkin_status = "✅ Complete" if today_checkins else "📝 Pending"
@@ -320,6 +320,11 @@ def main():
                 st.switch_page("pages/weekly_summary.py")
         
         with col4:
+            # Generate weekly summary button
+            if st.button("🤖 Generate AI Summary", use_container_width=True):
+                generate_weekly_summary_inline(user_email, user_profile, mood_data, checkin_data)
+        
+        with col5:
             # Placeholder for insights button - will be populated after user_email is defined
             st.button("📈 View Insights", use_container_width=True, disabled=True, help="Loading...")
         
@@ -476,6 +481,270 @@ def display_gpt_quota_badge(user_email):
     except Exception as e:
         # Silently fail if there's an issue with usage tracking
         pass
+
+def generate_weekly_summary_inline(user_email, user_profile, mood_data, checkin_data):
+    """Generate and display weekly summary inline in the main app"""
+    
+    if not user_email or not user_profile:
+        st.error("Please complete onboarding first!")
+        return
+    
+    # Get week date range
+    today = datetime.now()
+    monday = today - timedelta(days=today.weekday())
+    sunday = monday + timedelta(days=6)
+    start_date, end_date = monday.date(), sunday.date()
+    
+    # Filter data for current week
+    week_checkins = []
+    week_moods = []
+    
+    for checkin in checkin_data:
+        checkin_date = datetime.fromisoformat(checkin['timestamp']).date()
+        if start_date <= checkin_date <= end_date:
+            week_checkins.append(checkin)
+    
+    for mood in mood_data:
+        mood_date = datetime.fromisoformat(mood['timestamp']).date()
+        if start_date <= mood_date <= end_date:
+            week_moods.append(mood)
+    
+    # Analyze patterns
+    week_analysis = analyze_weekly_patterns_inline(week_checkins, week_moods)
+    
+    if not week_analysis or (week_analysis['total_checkins'] == 0 and week_analysis['total_mood_entries'] == 0):
+        st.info("📝 **No data for this week yet!** Start your wellness journey by completing your first check-in or mood entry.")
+        return
+    
+    # Display week range
+    st.write("---")
+    st.subheader(f"📊 Weekly Summary ({start_date.strftime('%B %d')} - {end_date.strftime('%B %d, %Y')})")
+    
+    # Show loading animation
+    with st.spinner("🤖 Generating your personalized weekly insights..."):
+        try:
+            # Initialize AI service
+            from assistant.ai_service import AIService
+            ai_service = AIService()
+            
+            # Generate prompt
+            prompt = generate_weekly_summary_prompt_inline(user_profile, week_analysis, start_date, end_date)
+            
+            # Get AI summary with loading animation
+            summary = ai_service.generate_weekly_summary(user_profile, week_analysis, user_email)
+            
+            if summary:
+                st.success("✨ **Your Weekly Insights**")
+                
+                # Display structured summary
+                display_structured_summary_inline(summary)
+                
+                # Add a "View Full Summary" button
+                if st.button("📖 View Full Weekly Summary Page", use_container_width=True):
+                    st.switch_page("pages/weekly_summary.py")
+                
+            else:
+                # Fallback to rule-based summary
+                st.info("📊 **Your Weekly Summary**")
+                generate_fallback_summary_inline(week_analysis, user_profile)
+                
+        except Exception as e:
+            st.warning("🤖 AI summary temporarily unavailable. Here's your weekly overview:")
+            generate_fallback_summary_inline(week_analysis, user_profile)
+
+def analyze_weekly_patterns_inline(checkins, moods):
+    """Analyze patterns in weekly data for inline summary"""
+    if not checkins and not moods:
+        return None
+    
+    analysis = {
+        'total_checkins': len(checkins),
+        'total_mood_entries': len(moods),
+        'checkin_days': [],
+        'mood_days': [],
+        'energy_patterns': {},
+        'mood_patterns': {},
+        'time_periods': {},
+        'accomplishments': [],
+        'challenges': []
+    }
+    
+    # Analyze check-ins
+    for checkin in checkins:
+        date = datetime.fromisoformat(checkin['timestamp']).date()
+        day_name = date.strftime('%A')
+        analysis['checkin_days'].append(day_name)
+        
+        # Energy patterns
+        if 'energy_level' in checkin:
+            energy = checkin['energy_level']
+            if day_name not in analysis['energy_patterns']:
+                analysis['energy_patterns'][day_name] = []
+            analysis['energy_patterns'][day_name].append(energy)
+        
+        # Time periods
+        time_period = checkin.get('time_period', 'unknown')
+        if time_period not in analysis['time_periods']:
+            analysis['time_periods'][time_period] = 0
+        analysis['time_periods'][time_period] += 1
+        
+        # Accomplishments and challenges
+        if 'accomplishments' in checkin and checkin['accomplishments']:
+            analysis['accomplishments'].append(checkin['accomplishments'])
+        if 'challenges' in checkin and checkin['challenges']:
+            analysis['challenges'].append(checkin['challenges'])
+    
+    # Analyze mood data
+    for mood in moods:
+        date = datetime.fromisoformat(mood['timestamp']).date()
+        day_name = date.strftime('%A')
+        analysis['mood_days'].append(day_name)
+        
+        mood_type = mood.get('mood', 'unknown')
+        intensity = mood.get('intensity', 5)
+        
+        if day_name not in analysis['mood_patterns']:
+            analysis['mood_patterns'][day_name] = {'moods': [], 'intensities': []}
+        analysis['mood_patterns'][day_name]['moods'].append(mood_type)
+        analysis['mood_patterns'][day_name]['intensities'].append(intensity)
+    
+    return analysis
+
+def generate_weekly_summary_prompt_inline(user_profile, week_analysis, start_date, end_date):
+    """Generate optimized prompt for inline weekly summary"""
+    
+    # Extract essential data
+    essential_data = {
+        'checkins': week_analysis['total_checkins'],
+        'moods': week_analysis['total_mood_entries'],
+        'active_days': len(set(week_analysis['checkin_days'])),
+        'goal': user_profile.get('goal', 'Improve focus and productivity'),
+        'tone': user_profile.get('tone', 'Friendly')
+    }
+    
+    # Find key patterns efficiently
+    if week_analysis['energy_patterns']:
+        energy_days = list(week_analysis['energy_patterns'].keys())
+        essential_data['energy_days'] = energy_days[:3]  # Top 3 days
+    
+    if week_analysis['mood_patterns']:
+        all_moods = []
+        for day_data in week_analysis['mood_patterns'].values():
+            all_moods.extend(day_data['moods'])
+        if all_moods:
+            essential_data['top_mood'] = max(set(all_moods), key=all_moods.count)
+    
+    # Create concise prompt
+    prompt = f"""
+Analyze weekly wellness data and provide encouraging insights.
+
+User: {essential_data['goal']} | Tone: {essential_data['tone']}
+Data: {essential_data['checkins']} check-ins, {essential_data['moods']} moods, {essential_data['active_days']} active days
+Patterns: Energy peaks on {essential_data.get('energy_days', ['N/A'])} | Top mood: {essential_data.get('top_mood', 'N/A')}
+
+Answer these 3 key questions in 1-2 sentences each:
+1. **What mood dominated your week?**
+2. **What gave you energy most consistently?**
+3. **What's one habit that could help you next week?**
+"""
+    
+    return prompt
+
+def display_structured_summary_inline(summary):
+    """Display the AI summary in a structured format for inline display"""
+    
+    # Split the summary into sections based on numbered questions
+    lines = summary.strip().split('\n')
+    current_question = None
+    current_answer = []
+    
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+            
+        # Check if this is a new question (starts with number and **)
+        if line.startswith(('1.', '2.', '3.', '4.', '5.')) and '**' in line:
+            # Save previous question if exists
+            if current_question and current_answer:
+                display_question_answer_inline(current_question, ' '.join(current_answer))
+            
+            # Start new question
+            current_question = line
+            current_answer = []
+        else:
+            # Add to current answer
+            current_answer.append(line)
+    
+    # Display the last question
+    if current_question and current_answer:
+        display_question_answer_inline(current_question, ' '.join(current_answer))
+
+def display_question_answer_inline(question, answer):
+    """Display a single question and answer with nice formatting for inline"""
+    
+    # Extract question text
+    if '**' in question:
+        question_text = question.split('**')[1].split('**')[0]
+    else:
+        question_text = question
+    
+    # Create a nice card-like display
+    with st.container():
+        st.markdown(f"**{question_text}**")
+        st.info(answer)
+
+def generate_fallback_summary_inline(week_analysis, user_profile):
+    """Generate a rule-based summary when AI is unavailable for inline display"""
+    
+    total_checkins = week_analysis['total_checkins']
+    total_moods = week_analysis['total_mood_entries']
+    
+    # Basic summary
+    summary = f"Great job this week! You completed {total_checkins} check-in{'s' if total_checkins != 1 else ''} "
+    summary += f"and logged {total_moods} mood entr{'ies' if total_moods != 1 else 'y'}. "
+    
+    # Consistency message
+    active_days = len(set(week_analysis['checkin_days']))
+    if active_days >= 5:
+        summary += "You've been very consistent with your wellness routine! "
+    elif active_days >= 3:
+        summary += "You're building a great habit. Keep it up! "
+    else:
+        summary += "Every check-in helps you understand your patterns better. "
+    
+    # Energy insights
+    if week_analysis['energy_patterns']:
+        # Find highest energy day
+        highest_energy_day = None
+        highest_energy = 0
+        for day, energies in week_analysis['energy_patterns'].items():
+            high_count = energies.count('High')
+            if high_count > highest_energy:
+                highest_energy = high_count
+                highest_energy_day = day
+        
+        if highest_energy_day:
+            summary += f"Your energy was highest on {highest_energy_day}. "
+    
+    # Mood insights
+    if week_analysis['mood_patterns']:
+        all_moods = []
+        for day_data in week_analysis['mood_patterns'].values():
+            all_moods.extend(day_data['moods'])
+        
+        if all_moods:
+            most_common_mood = max(set(all_moods), key=all_moods.count)
+            summary += f"Your most common mood was {most_common_mood}. "
+    
+    # Accomplishments
+    if week_analysis['accomplishments']:
+        summary += f"You accomplished {len(week_analysis['accomplishments'])} thing{'s' if len(week_analysis['accomplishments']) != 1 else ''} this week. "
+    
+    # Encouragement
+    summary += "Keep up the great work on your wellness journey!"
+    
+    st.write(summary)
 
 if __name__ == "__main__":
     main()

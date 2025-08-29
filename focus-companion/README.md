@@ -266,6 +266,8 @@ Focus Companion now includes AI-powered personalization using OpenAI's GPT-3.5-t
 - **Weekly Summary Automation** - AI-generated insights with intelligent prompts
 - **GPT Quota UI** - Real-time usage badges and limit notifications
 - **Structured Weekly Insights** - 5 key questions with personalized answers
+- **Inline Summary Generation** - One-click weekly summary from main dashboard
+- **Enhanced Loading Animations** - Beautiful progress indicators for AI responses
 
 For setup instructions, see [AI_SETUP.md](AI_SETUP.md).
 

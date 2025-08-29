@@ -263,39 +263,58 @@ def main():
     # Show GPT quota badge
     display_gpt_quota_badge(user_email)
     
-    # Show loading state
-    with st.spinner("Generating your personalized weekly insights..."):
-        try:
-            # Initialize AI service
-            ai_service = AIService()
+    # Show enhanced loading state with progress
+    progress_bar = st.progress(0)
+    status_text = st.empty()
+    
+    # Simulate progress steps
+    status_text.text("🤖 Analyzing your weekly data...")
+    progress_bar.progress(25)
+    
+    status_text.text("📊 Identifying patterns and trends...")
+    progress_bar.progress(50)
+    
+    status_text.text("🧠 Crafting personalized insights...")
+    progress_bar.progress(75)
+    
+    try:
+        # Initialize AI service
+        ai_service = AIService()
+        
+        # Generate prompt
+        prompt = generate_weekly_summary_prompt(user_profile, week_analysis, start_date, end_date)
+        
+        # Get AI summary
+        summary = ai_service.generate_weekly_summary(user_profile, week_analysis, user_email)
+        
+        # Complete progress
+        progress_bar.progress(100)
+        status_text.text("✅ Weekly insights ready!")
+        
+        if summary:
+            st.success("✨ **Your Weekly Insights**")
             
-            # Generate prompt
-            prompt = generate_weekly_summary_prompt(user_profile, week_analysis, start_date, end_date)
+            # Display structured summary
+            display_structured_summary(summary)
             
-            # Get AI summary
-            summary = ai_service.generate_weekly_summary(user_profile, week_analysis, user_email)
-            
-            if summary:
-                st.success("✨ **Your Weekly Insights**")
-                
-                # Display structured summary
-                display_structured_summary(summary)
-                
-                # Record AI usage
-                ai_service.usage_limiter.record_api_call(
-                    user_email=user_email,
-                    feature="weekly_summary",
-                    tokens_used=None,  # Will be calculated by AI service
-                    cost_usd=None
-                )
-            else:
-                # Fallback to rule-based summary
-                st.info("📊 **Your Weekly Summary**")
-                generate_fallback_summary(week_analysis, user_profile)
-                
-        except Exception as e:
-            st.warning("🤖 AI summary temporarily unavailable. Here's your weekly overview:")
+            # Record AI usage
+            ai_service.usage_limiter.record_api_call(
+                user_email=user_email,
+                feature="weekly_summary",
+                tokens_used=None,  # Will be calculated by AI service
+                cost_usd=None
+            )
+        else:
+            # Fallback to rule-based summary
+            st.info("📊 **Your Weekly Summary**")
             generate_fallback_summary(week_analysis, user_profile)
+            
+    except Exception as e:
+        # Complete progress even on error
+        progress_bar.progress(100)
+        status_text.text("⚠️ Using fallback summary")
+        st.warning("🤖 AI summary temporarily unavailable. Here's your weekly overview:")
+        generate_fallback_summary(week_analysis, user_profile)
     
     # Display detailed patterns
     st.write("---")

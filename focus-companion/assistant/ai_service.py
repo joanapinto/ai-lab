@@ -111,15 +111,17 @@ class AIService:
         prompt = PromptOptimizer.optimize_greeting_prompt(user_profile, recent_data)
         
         try:
-            response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are a supportive, encouraging assistant focused on helping users achieve their goals."},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=100,
-                temperature=0.7
-            )
+            # Show enhanced loading feedback
+            with st.spinner("🤖 AI is crafting your personalized greeting..."):
+                response = self.client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": "You are a supportive, encouraging assistant focused on helping users achieve their goals."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    max_tokens=100,
+                    temperature=0.7
+                )
             
             result = response.choices[0].message.content.strip()
             
@@ -175,15 +177,17 @@ class AIService:
         prompt += "\n\nPlease provide an encouraging message (1-2 sentences) that acknowledges their progress and motivates them to continue. Keep it concise and personal."
         
         try:
-            response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are an encouraging, supportive assistant helping users stay motivated."},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=80,
-                temperature=0.7
-            )
+            # Show enhanced loading feedback
+            with st.spinner("🤖 AI is crafting your daily encouragement..."):
+                response = self.client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": "You are an encouraging, supportive assistant helping users stay motivated."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    max_tokens=80,
+                    temperature=0.7
+                )
             
             result = response.choices[0].message.content.strip()
             
@@ -230,15 +234,17 @@ class AIService:
         prompt += "\n\nPlease provide one specific, actionable productivity tip that considers their current situation and energy drainers. Keep it practical and implementable."
         
         try:
-            response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are a productivity expert providing practical, personalized advice."},
-                    {"role": "user", "content": prompt}
+            # Show enhanced loading feedback
+            with st.spinner("🤖 AI is crafting your personalized productivity tip..."):
+                response = self.client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": "You are a productivity expert providing practical, personalized advice."},
+                        {"role": "user", "content": prompt}
                 ],
-                max_tokens=60,
-                temperature=0.7
-            )
+                    max_tokens=60,
+                    temperature=0.7
+                )
             
             result = response.choices[0].message.content.strip()
             
@@ -420,15 +426,17 @@ class AIService:
         prompt = PromptOptimizer.optimize_weekly_summary_prompt(user_profile, week_analysis)
 
         try:
-            response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are a supportive wellness coach who celebrates progress and provides encouraging insights."},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=400,
-                temperature=0.8
-            )
+            # Show enhanced loading feedback
+            with st.spinner("🤖 AI is analyzing your weekly patterns and crafting personalized insights..."):
+                response = self.client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": "You are a supportive wellness coach who celebrates progress and provides encouraging insights."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    max_tokens=400,
+                    temperature=0.8
+                )
             result = response.choices[0].message.content.strip()
             
             # Cache the response
