@@ -212,25 +212,61 @@ def main():
             usage_limiter = UsageLimiter()
             stats = usage_limiter.get_usage_stats(user_email)
             
-            with st.expander("📊 AI Usage Stats"):
+            with st.expander("🤖 AI Usage Statistics", expanded=False):
+                # Global usage
+                st.subheader("🌍 Global Usage")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    daily_used = stats["global"]["daily_used"]
+                    daily_limit = stats["global"]["daily_limit"]
+                    st.metric("Daily API Calls", f"{daily_used}/{daily_limit}")
+                    st.progress(daily_used / daily_limit)
+                
+                with col2:
+                    monthly_used = stats["global"]["monthly_used"]
+                    monthly_limit = stats["global"]["monthly_limit"]
+                    st.metric("Monthly API Calls", f"{monthly_used}/{monthly_limit}")
+                    st.progress(monthly_used / monthly_limit)
+                
+                with col3:
+                    total_cost = stats["global"]["total_cost"]
+                    st.metric("Total Cost", f"${total_cost:.4f}")
+                
+                # User usage
                 if "user" in stats:
-                    col1, col2 = st.columns(2)
+                    st.subheader("👤 Your Usage")
+                    col1, col2, col3 = st.columns(3)
                     with col1:
-                        st.metric("Daily Usage", f"{stats['user']['daily_used']}/{stats['user']['daily_limit']}")
+                        user_daily = stats["user"]["daily_used"]
+                        user_daily_limit = stats["user"]["daily_limit"]
+                        st.metric("Your Daily Calls", f"{user_daily}/{user_daily_limit}")
+                        st.progress(user_daily / user_daily_limit)
+                    
                     with col2:
-                        st.metric("Monthly Usage", f"{stats['user']['monthly_used']}/{stats['user']['monthly_limit']}")
+                        user_monthly = stats["user"]["monthly_used"]
+                        user_monthly_limit = stats["user"]["monthly_limit"]
+                        st.metric("Your Monthly Calls", f"{user_monthly}/{user_monthly_limit}")
+                        st.progress(user_monthly / user_monthly_limit)
                     
-                    # Show progress bars
-                    daily_progress = stats['user']['daily_used'] / stats['user']['daily_limit']
-                    monthly_progress = stats['user']['monthly_used'] / stats['user']['monthly_limit']
+                    with col3:
+                        user_cost = stats["user"]["total_cost"]
+                        st.metric("Your Cost", f"${user_cost:.4f}")
                     
-                    st.progress(daily_progress, text="Daily Progress")
-                    st.progress(monthly_progress, text="Monthly Progress")
+                    # Feature breakdown
+                    if "feature_usage" in stats["user"]:
+                        st.subheader("🔧 Feature Usage")
+                        feature_usage = stats["user"]["feature_usage"]
+                        if feature_usage:
+                            for feature, count in feature_usage.items():
+                                st.write(f"• **{feature.title()}**: {count} calls")
+                        else:
+                            st.info("No AI features used yet")
                     
-                    if daily_progress > 0.8:
-                        st.warning("⚠️ You're approaching your daily AI usage limit")
-                    if monthly_progress > 0.8:
-                        st.warning("⚠️ You're approaching your monthly AI usage limit")
+                    # Show warnings if approaching limits
+                    if user_daily >= user_daily_limit * 0.8:
+                        st.warning("⚠️ You're approaching your daily AI usage limit!")
+                    if user_monthly >= user_monthly_limit * 0.8:
+                        st.warning("⚠️ You're approaching your monthly AI usage limit!")
         
         # Navigation options
         col1, col2 = st.columns(2)
@@ -259,7 +295,8 @@ def main():
             if st.button("📖 Mood Journal", use_container_width=True):
                 st.switch_page("pages/mood_journal.py")
         with col4:
-            st.write("")  # Empty space for balance
+            if st.button("📈 Insights", use_container_width=True):
+                st.switch_page("pages/insights.py")
         
         # Feedback section on main dashboard
         st.write("---")

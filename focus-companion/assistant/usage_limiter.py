@@ -8,6 +8,10 @@ import os
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 import streamlit as st
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from data.database import DatabaseManager
 
 class UsageLimiter:
     """Manages API usage limits and tracking"""
@@ -18,6 +22,9 @@ class UsageLimiter:
         self.monthly_limit = 2000  # API calls per month (5 users × 400 calls)
         self.user_daily_limit = 20  # API calls per user per day
         self.user_monthly_limit = 400  # API calls per user per month
+        
+        # Initialize database manager
+        self.db = DatabaseManager()
         
     def _load_usage_data(self) -> Dict:
         """Load usage tracking data from file"""
@@ -70,89 +77,74 @@ class UsageLimiter:
         Check if an API call can be made
         Returns (allowed, reason)
         """
-        data = self._load_usage_data()
-        
-        # Reset counters if needed
-        self._reset_daily_usage(data)
-        self._reset_monthly_usage(data)
-        
-        today = datetime.now().strftime("%Y-%m-%d")
-        this_month = datetime.now().strftime("%Y-%m")
+        # Get usage from database
+        global_usage = self.db.get_global_api_usage(days=1)  # Today
+        global_monthly = self.db.get_global_api_usage(days=30)  # This month
         
         # Check global daily limit
-        daily_total = sum(data["daily_usage"].values())
-        if daily_total >= self.daily_limit:
+        today_usage = sum(global_usage["daily_usage"].values())
+        if today_usage >= self.daily_limit:
             return False, f"Daily API limit reached ({self.daily_limit} calls)"
         
         # Check global monthly limit
-        monthly_total = sum(data["monthly_usage"].values())
-        if monthly_total >= self.monthly_limit:
+        monthly_usage = sum(global_monthly["monthly_usage"].values())
+        if monthly_usage >= self.monthly_limit:
             return False, f"Monthly API limit reached ({self.monthly_limit} calls)"
         
         # Check user-specific limits
         if user_email:
-            user_daily = data["user_usage"].get(user_email, {}).get(today, 0)
+            user_usage = self.db.get_user_api_usage(user_email, days=1)
+            user_monthly = self.db.get_user_api_usage(user_email, days=30)
+            
+            user_daily = sum(user_usage["daily_usage"].values())
             if user_daily >= self.user_daily_limit:
                 return False, f"Your daily limit reached ({self.user_daily_limit} calls)"
             
-            user_monthly = data["user_usage"].get(user_email, {}).get(this_month, 0)
-            if user_monthly >= self.user_monthly_limit:
+            user_monthly_total = sum(user_monthly["monthly_usage"].values())
+            if user_monthly_total >= self.user_monthly_limit:
                 return False, f"Your monthly limit reached ({self.user_monthly_limit} calls)"
         
         return True, "API call allowed"
     
-    def record_api_call(self, user_email: str = None):
+    def record_api_call(self, user_email: str = None, feature: str = "unknown", 
+                       tokens_used: int = None, cost_usd: float = None):
         """Record that an API call was made"""
-        data = self._load_usage_data()
-        
-        # Reset counters if needed
-        self._reset_daily_usage(data)
-        self._reset_monthly_usage(data)
-        
-        today = datetime.now().strftime("%Y-%m-%d")
-        this_month = datetime.now().strftime("%Y-%m")
-        
-        # Update global daily usage
-        data["daily_usage"][today] = data["daily_usage"].get(today, 0) + 1
-        
-        # Update global monthly usage
-        data["monthly_usage"][this_month] = data["monthly_usage"].get(this_month, 0) + 1
-        
-        # Update user-specific usage
         if user_email:
-            if user_email not in data["user_usage"]:
-                data["user_usage"][user_email] = {}
-            
-            data["user_usage"][user_email][today] = data["user_usage"][user_email].get(today, 0) + 1
-            data["user_usage"][user_email][this_month] = data["user_usage"][user_email].get(this_month, 0) + 1
-        
-        self._save_usage_data(data)
+            self.db.record_api_usage(
+                user_email=user_email,
+                feature=feature,
+                tokens_used=tokens_used,
+                cost_usd=cost_usd,
+                success=True
+            )
     
     def get_usage_stats(self, user_email: str = None) -> Dict:
         """Get current usage statistics"""
-        data = self._load_usage_data()
-        
-        today = datetime.now().strftime("%Y-%m-%d")
-        this_month = datetime.now().strftime("%Y-%m")
+        # Get global stats
+        global_usage = self.db.get_global_api_usage(days=1)
+        global_monthly = self.db.get_global_api_usage(days=30)
         
         stats = {
             "global": {
-                "daily_used": sum(data["daily_usage"].values()),
+                "daily_used": sum(global_usage["daily_usage"].values()),
                 "daily_limit": self.daily_limit,
-                "monthly_used": sum(data["monthly_usage"].values()),
-                "monthly_limit": self.monthly_limit
+                "monthly_used": sum(global_monthly["monthly_usage"].values()),
+                "monthly_limit": self.monthly_limit,
+                "total_cost": global_monthly["total_cost"]
             }
         }
         
         if user_email:
-            user_daily = data["user_usage"].get(user_email, {}).get(today, 0)
-            user_monthly = data["user_usage"].get(user_email, {}).get(this_month, 0)
+            user_usage = self.db.get_user_api_usage(user_email, days=1)
+            user_monthly = self.db.get_user_api_usage(user_email, days=30)
             
             stats["user"] = {
-                "daily_used": user_daily,
+                "daily_used": sum(user_usage["daily_usage"].values()),
                 "daily_limit": self.user_daily_limit,
-                "monthly_used": user_monthly,
-                "monthly_limit": self.user_monthly_limit
+                "monthly_used": sum(user_monthly["monthly_usage"].values()),
+                "monthly_limit": self.user_monthly_limit,
+                "total_cost": user_monthly["total_cost"],
+                "feature_usage": user_monthly["feature_usage"]
             }
         
         return stats

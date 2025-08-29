@@ -41,6 +41,8 @@ allowed_emails.txt
 # Usage tracking and session data (contains user-specific data)
 data/usage_tracking.json
 data/user_session.json
+data/focus_companion.db
+data/*_backup.json
 
 # Streamlit cache and temporary files
 .streamlit/

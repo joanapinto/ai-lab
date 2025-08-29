@@ -162,11 +162,14 @@ focus-companion/
 │   ├── reflection.py      # Weekly reflections
 │   └── history.py         # Progress history
 ├── data/                  # Data storage
-│   ├── storage.py         # User profile & data management
-│   ├── user_profile.json  # User profile data
-│   ├── mood_data.json     # Persistent mood tracking data
-│   ├── checkin_data.json  # Persistent daily check-in data
-│   ├── usage_tracking.json # AI usage tracking & limits
+│   ├── database.py        # SQLite database manager
+│   ├── storage.py         # Hybrid JSON/SQLite storage
+│   ├── migrate_to_sqlite.py # Data migration utility
+│   ├── focus_companion.db # SQLite database (auto-generated)
+│   ├── user_profile.json  # User profile data (backup)
+│   ├── mood_data.json     # Persistent mood tracking data (backup)
+│   ├── checkin_data.json  # Persistent daily check-in data (backup)
+│   ├── usage_tracking.json # AI usage tracking & limits (backup)
 │   └── user_session.json  # Persistent authentication sessions
 ├── assistant/             # AI assistant logic
 │   ├── logic.py           # Core assistant intelligence
@@ -187,10 +190,10 @@ focus-companion/
 - **Data Visualization**: Plotly
 - **Data Processing**: Pandas
 - **AI Integration**: OpenAI (GPT-3.5-turbo)
-- **Data Storage**: JSON files with persistent storage (expandable to database)
+- **Data Storage**: SQLite database with JSON backup for compatibility
 - **Data Persistence**: Automatic saving and loading of all user data
 - **Authentication**: Custom beta access control with persistent sessions
-- **Usage Tracking**: Local JSON-based usage monitoring and limits
+- **Usage Tracking**: SQLite-based usage monitoring with detailed analytics
 - **Feedback Integration**: Tally form integration for beta testing
 
 ## 🤖 AI Features
@@ -234,6 +237,14 @@ Focus Companion now includes AI-powered personalization using OpenAI's GPT-3.5-t
 - **Persistent authentication** - no need to re-enter email
 - **Usage statistics** - real-time tracking of AI usage
 - **Contextual feedback prompts** - collected at optimal moments
+
+### **🗄️ SQLite Database Features**
+- **Enhanced performance** - Faster queries and better scalability
+- **Detailed analytics** - Track usage patterns, costs, and feature adoption
+- **Data integrity** - ACID compliance prevents data corruption
+- **Easy migration** - Automatic migration from JSON to SQLite
+- **Backup compatibility** - JSON files maintained as backup
+- **Advanced queries** - Complex analytics and reporting capabilities
 
 For setup instructions, see [AI_SETUP.md](AI_SETUP.md).
 

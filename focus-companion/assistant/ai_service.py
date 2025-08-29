@@ -118,8 +118,16 @@ class AIService:
             
             result = response.choices[0].message.content.strip()
             
-            # Record the API call
-            self.usage_limiter.record_api_call(user_email)
+            # Record the API call with detailed information
+            tokens_used = response.usage.total_tokens if response.usage else None
+            cost_usd = (tokens_used * 0.000002) if tokens_used else None  # GPT-3.5-turbo pricing
+            
+            self.usage_limiter.record_api_call(
+                user_email=user_email,
+                feature="greeting",
+                tokens_used=tokens_used,
+                cost_usd=cost_usd
+            )
             
             return result
             
@@ -170,8 +178,16 @@ class AIService:
             
             result = response.choices[0].message.content.strip()
             
-            # Record the API call
-            self.usage_limiter.record_api_call(user_email)
+            # Record the API call with detailed information
+            tokens_used = response.usage.total_tokens if response.usage else None
+            cost_usd = (tokens_used * 0.000002) if tokens_used else None  # GPT-3.5-turbo pricing
+            
+            self.usage_limiter.record_api_call(
+                user_email=user_email,
+                feature="encouragement",
+                tokens_used=tokens_used,
+                cost_usd=cost_usd
+            )
             
             return result
             
@@ -217,8 +233,16 @@ class AIService:
             
             result = response.choices[0].message.content.strip()
             
-            # Record the API call
-            self.usage_limiter.record_api_call(user_email)
+            # Record the API call with detailed information
+            tokens_used = response.usage.total_tokens if response.usage else None
+            cost_usd = (tokens_used * 0.000002) if tokens_used else None  # GPT-3.5-turbo pricing
+            
+            self.usage_limiter.record_api_call(
+                user_email=user_email,
+                feature="productivity_tip",
+                tokens_used=tokens_used,
+                cost_usd=cost_usd
+            )
             
             return result
             
