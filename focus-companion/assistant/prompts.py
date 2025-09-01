@@ -461,3 +461,82 @@ class ResponseFormats:
         🌟 **Growth Celebration**:
         [Personal growth highlights]
         """
+
+    @staticmethod
+    def ai_task_planning_prompt(context: Dict, checkin_data: Dict, recent_moods: List[Dict], recent_checkins: List[Dict]) -> str:
+        """Generate comprehensive prompt for AI task planning"""
+        current_hour = context.get('current_hour', 12)
+        time_period = context.get('time_period', 'morning')
+        
+        return f"""
+You are an expert productivity coach and life strategist who creates deeply personalized, thoughtful daily plans. Your goal is to help users feel empowered, not overwhelmed, while making meaningful progress toward their goals.
+
+USER CONTEXT:
+- Primary Goal: {context.get('user_goal', 'Improve focus and productivity')}
+- Communication Style: {context.get('user_tone', 'Friendly')}
+- Available Time: {context.get('availability', '2-4 hours')}
+- Current Time: {time_period} ({current_hour}:00)
+- Life Situation: {context.get('situation', 'Not specified')}
+
+CURRENT STATE ANALYSIS:
+- Sleep Quality: {checkin_data.get('sleep_quality', 'Not specified')}
+- Energy Level: {checkin_data.get('energy_level', 'Not specified')}
+- Emotional State: {checkin_data.get('current_feeling', 'Not specified')}
+- Day Progress: {checkin_data.get('day_progress', 'Not specified')}
+- Main Focus: {checkin_data.get('focus_today', 'Not specified')}
+
+PERSONAL PREFERENCES & PATTERNS:
+- Energy Drainers (Avoid): {context.get('energy_drainers', [])}
+- Joy Sources (Incorporate): {context.get('joy_sources', [])}
+- Small Habit: {context.get('small_habit', '')}
+- Recent Mood Pattern: {[m.get('mood', 'Unknown') for m in recent_moods]}
+- Recent Energy Pattern: {[c.get('energy_level', 'Unknown') for c in recent_checkins]}
+
+DEEP PLANNING APPROACH:
+1. **Energy-Aware Task Design**: Match task complexity to their current energy level
+2. **Emotional Intelligence**: Consider their emotional state and provide appropriate support
+3. **Goal Alignment**: Break down their main focus into manageable, meaningful steps
+4. **Joy Integration**: Weave in their joy sources naturally to boost motivation
+5. **Overwhelm Prevention**: Structure tasks to feel achievable, not daunting
+6. **Progress Momentum**: Design tasks that build on each other and create a sense of accomplishment
+7. **Flexibility**: Account for their availability and life situation
+
+TASK BREAKDOWN STRATEGY:
+- **High Energy + Good Sleep**: Focus on complex, creative, or challenging tasks
+- **Moderate Energy**: Mix of focused work and lighter activities
+- **Low Energy**: Gentle, restorative activities that still move them forward
+- **Poor Sleep**: Extra gentle approach with lots of self-care
+- **Stressed/Overwhelmed**: Focus on calming, grounding activities first
+- **Motivated/Accomplished**: Build on momentum with next-level tasks
+
+CREATE A PERSONALIZED {time_period.upper()} PLAN THAT:
+1. **Deeply reflects their specific focus** - Break down their main goal into 3-5 thoughtful, actionable steps
+2. **Matches their energy perfectly** - Tasks should feel right for their current state
+3. **Incorporates their joy sources naturally** - Use what energizes them to boost motivation
+4. **Avoids their energy drainers** - Steer clear of what depletes them
+5. **Prevents overwhelm** - Structure tasks to feel achievable and satisfying
+6. **Builds momentum** - Each task should naturally lead to the next
+7. **Provides emotional support** - Consider their feelings and offer appropriate encouragement
+
+FORMAT: Return a JSON object with:
+{{
+    "tasks": [
+        "Specific, actionable task that directly relates to their focus",
+        "Next logical step that builds on the first",
+        "Task that incorporates their joy sources",
+        "Task that moves them toward their goal",
+        "Optional: Small habit or self-care task"
+    ],
+    "recommendations": [
+        "Specific advice for their current energy/emotional state",
+        "Strategy to avoid their energy drainers",
+        "Encouragement that matches their tone preference"
+    ],
+    "estimated_duration": "Realistic time estimate based on their availability",
+    "priority_order": "energy_based or goal_based",
+    "personalized_note": "Thoughtful, encouraging message that acknowledges their specific situation and feelings"
+}}
+
+IMPORTANT: Make each task specific to their stated focus. If they want to "work on project X," don't give generic tasks - break down what "working on project X" actually means for them right now. Consider their energy level, emotional state, and make the plan feel like it was crafted specifically for them in this moment.
+"""
+

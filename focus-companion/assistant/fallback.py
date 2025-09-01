@@ -364,39 +364,57 @@ class FallbackAssistant:
     
     def _generate_morning_task_plan(self, sleep_quality: str, energy_level: str, focus_goal: str) -> Dict:
         """Generate morning task plan based on sleep and energy"""
+        import random
+        
         tasks = []
         recommendations = []
         
         # Adjust based on sleep quality
         if sleep_quality in ['Poor', 'Terrible']:
-            tasks.extend([
+            gentle_tasks = [
                 "🌅 Gentle morning routine (10 min)",
                 "💧 Hydrate with water",
-                "🧘 Light stretching or meditation"
-            ])
+                "🧘 Light stretching or meditation",
+                "☕ Enjoy a warm beverage slowly",
+                "🌱 Spend 5 minutes with plants or nature",
+                "📖 Read something uplifting for 10 minutes"
+            ]
+            tasks.extend(random.sample(gentle_tasks, 3))
             recommendations.append("Start with gentle activities to build momentum")
         elif sleep_quality in ['Excellent', 'Good']:
-            tasks.extend([
+            productive_tasks = [
                 "🎯 Tackle your most important task first",
                 "📝 Review and prioritize today's goals",
-                "🏃‍♂️ Consider exercise if energy is high"
-            ])
+                "🏃‍♂️ Consider exercise if energy is high",
+                "⚡ Use your peak energy for complex work",
+                "📊 Plan your day with specific time blocks",
+                "🎨 Start with creative or challenging tasks"
+            ]
+            tasks.extend(random.sample(productive_tasks, 3))
             recommendations.append("Great sleep! You're ready for focused work")
         
         # Adjust based on energy level
         if energy_level in ['Low', 'Very low']:
-            tasks.extend([
+            energy_boost_tasks = [
                 "☕ Have a healthy breakfast",
                 "🚶‍♂️ Take a short walk outside",
-                "📚 Start with lighter, more enjoyable tasks"
-            ])
+                "📚 Start with lighter, more enjoyable tasks",
+                "🍎 Eat a nutritious snack",
+                "🌞 Get some natural light exposure",
+                "🎵 Listen to energizing music"
+            ]
+            tasks.extend(random.sample(energy_boost_tasks, 3))
             recommendations.append("Build energy gradually with nourishing activities")
         elif energy_level in ['High', 'Good']:
-            tasks.extend([
+            high_energy_tasks = [
                 "⚡ Use your high energy for complex tasks",
                 "🎯 Break down your main goal into 2-3 key actions",
-                "⏰ Set specific time blocks for focused work"
-            ])
+                "⏰ Set specific time blocks for focused work",
+                "🚀 Tackle challenging projects first",
+                "📈 Work on skill development",
+                "🎨 Engage in creative problem-solving"
+            ]
+            tasks.extend(random.sample(high_energy_tasks, 3))
             recommendations.append("Perfect energy for productive deep work")
         
         # Add focus goal breakdown

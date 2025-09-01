@@ -37,6 +37,19 @@ else:
     # Initialize assistant for personalized insights
     assistant = FallbackAssistant(user_profile, mood_data, checkin_data)
     
+    # Initialize AI service for task planning
+    try:
+        from assistant.ai_service import AIService
+        ai_service = AIService()
+        from auth import get_user_email
+        user_email = get_user_email()
+        ai_service_available = True
+    except Exception as e:
+        st.warning(f"🤖 AI service initialization failed: {str(e)}")
+        ai_service_available = False
+        ai_service = None
+        user_email = None
+    
     # Determine time of day with more granular awareness
     current_time = datetime.now()
     current_hour = current_time.hour
@@ -317,8 +330,29 @@ else:
                 if checkin_mode == "🎯 Get help planning my day":
                     st.subheader("🎯 Your Smart Task Plan")
                     
-                    # Generate task plan using assistant
-                    task_plan = assistant.generate_smart_task_plan(checkin_data, focus_today)
+                    # Prepare current check-in data for AI
+                    current_checkin_data = {
+                        'time_period': 'morning',
+                        'sleep_quality': sleep_quality,
+                        'energy_level': energy_level,
+                        'focus_today': focus_today,
+                        'current_feeling': current_feeling,
+                        'day_progress': 'Not applicable for morning'
+                    }
+                    
+                    # Generate AI-powered task plan
+                    if ai_service_available and ai_service:
+                        task_plan = ai_service.generate_ai_task_plan(user_profile, current_checkin_data, mood_data, user_email)
+                        
+                        # Fallback to rule-based plan if AI fails
+                        if not task_plan:
+                            st.info("🤖 AI task planning unavailable, using smart fallback system...")
+                            task_plan = assistant.generate_smart_task_plan(checkin_data, focus_today)
+                        else:
+                            st.success("🤖 AI-powered personalized plan generated!")
+                    else:
+                        st.info("🤖 AI service not available, using smart fallback system...")
+                        task_plan = assistant.generate_smart_task_plan(checkin_data, focus_today)
                     
                     # Display tasks
                     st.write("**📋 Recommended Tasks:**")
@@ -365,6 +399,25 @@ else:
             
             # Step 2: Goals & Energy
             st.subheader("🎯 Step 2: Goals & Energy")
+            
+            # Energy level for afternoon
+            energy_level = st.selectbox(
+                "🔋 How's your energy now?",
+                ["High", "Good", "Moderate", "Low", "Very low"]
+            )
+            
+            # Focus today (what they're focusing on)
+            focus_today = st.text_area(
+                "🎯 What are you focusing on today?",
+                placeholder="e.g., Work project, Exercise, Reading, Social activities",
+                help="What's your main focus or priority today?"
+            )
+            
+            # Current feeling
+            current_feeling = st.selectbox(
+                "😊 How are you feeling right now?",
+                ["Motivated", "Good", "Okay", "Tired", "Stressed"]
+            )
             
             # Time-aware progress question
             if current_hour < 14:
@@ -433,6 +486,9 @@ else:
                 checkin_data = {
                     "timestamp": datetime.now().isoformat(),
                     "time_period": "afternoon",
+                    "energy_level": energy_level,
+                    "focus_today": focus_today,
+                    "current_feeling": current_feeling,
                     "day_progress": day_progress,
                     "adjust_plan": adjust_plan,
                     "take_break": take_break,
@@ -467,8 +523,29 @@ else:
                 if checkin_mode == "🎯 Get help planning my day":
                     st.subheader("🎯 Your Smart Afternoon Plan")
                     
-                    # Generate task plan using assistant
-                    task_plan = assistant.generate_smart_task_plan(checkin_data)
+                    # Prepare current check-in data for AI
+                    current_checkin_data = {
+                        'time_period': 'afternoon',
+                        'sleep_quality': 'Not applicable for afternoon',
+                        'energy_level': energy_level,
+                        'focus_today': focus_today,
+                        'current_feeling': current_feeling,
+                        'day_progress': day_progress
+                    }
+                    
+                    # Generate AI-powered task plan
+                    if ai_service_available and ai_service:
+                        task_plan = ai_service.generate_ai_task_plan(user_profile, current_checkin_data, mood_data, user_email)
+                        
+                        # Fallback to rule-based plan if AI fails
+                        if not task_plan:
+                            st.info("🤖 AI task planning unavailable, using smart fallback system...")
+                            task_plan = assistant.generate_smart_task_plan(checkin_data)
+                        else:
+                            st.success("🤖 AI-powered personalized plan generated!")
+                    else:
+                        st.info("🤖 AI service not available, using smart fallback system...")
+                        task_plan = assistant.generate_smart_task_plan(checkin_data)
                     
                     # Display tasks
                     st.write("**📋 Recommended Tasks:**")
@@ -521,6 +598,19 @@ else:
             
             # Step 2: Goals & Energy
             st.subheader("🎯 Step 2: Goals & Energy")
+            
+            # Energy level for evening
+            energy_level = st.selectbox(
+                "🔋 How's your energy now?",
+                ["High", "Good", "Moderate", "Low", "Very low"]
+            )
+            
+            # Focus today (what they focused on)
+            focus_today = st.text_area(
+                "🎯 What did you focus on today?",
+                placeholder="e.g., Work project, Exercise, Reading, Social activities",
+                help="What was your main focus or priority today?"
+            )
             
             # Time-aware accomplishment question
             if current_hour < 20:
@@ -591,6 +681,8 @@ else:
                 checkin_data = {
                     "timestamp": datetime.now().isoformat(),
                     "time_period": "evening",
+                    "energy_level": energy_level,
+                    "focus_today": focus_today,
                     "accomplishments": accomplishments,
                     "challenges": challenges,
                     "current_feeling": current_feeling,
@@ -625,8 +717,29 @@ else:
                 if checkin_mode == "🎯 Get help planning my day":
                     st.subheader("🌙 Your Smart Evening Plan")
                     
-                    # Generate task plan using assistant
-                    task_plan = assistant.generate_smart_task_plan(checkin_data)
+                    # Prepare current check-in data for AI
+                    current_checkin_data = {
+                        'time_period': 'evening',
+                        'sleep_quality': 'Not applicable for evening',
+                        'energy_level': energy_level,
+                        'focus_today': focus_today,
+                        'current_feeling': current_feeling,
+                        'day_progress': 'Not applicable for evening'
+                    }
+                    
+                    # Generate AI-powered task plan
+                    if ai_service_available and ai_service:
+                        task_plan = ai_service.generate_ai_task_plan(user_profile, current_checkin_data, mood_data, user_email)
+                        
+                        # Fallback to rule-based plan if AI fails
+                        if not task_plan:
+                            st.info("🤖 AI task planning unavailable, using smart fallback system...")
+                            task_plan = assistant.generate_smart_task_plan(checkin_data)
+                        else:
+                            st.success("🤖 AI-powered personalized plan generated!")
+                    else:
+                        st.info("🤖 AI service not available, using smart fallback system...")
+                        task_plan = assistant.generate_smart_task_plan(checkin_data)
                     
                     # Display tasks
                     st.write("**📋 Recommended Tasks:**")

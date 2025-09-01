@@ -238,6 +238,7 @@ Focus Companion now includes AI-powered personalization using OpenAI's GPT-3.5-t
 ### **💰 Cost Control & Usage Limits**
 - **Usage tracking** with daily and monthly limits
 - **Per-user limits** to prevent abuse and control costs
+- **Admin bypass** - unlimited access for admin user (joanapnpinto@gmail.com)
 - **Feature control** - can disable expensive AI features
 - **Transparent usage stats** - users can see their AI usage
 - **Predictable costs** - maximum $4/month for 5 beta testers
@@ -268,6 +269,8 @@ Focus Companion now includes AI-powered personalization using OpenAI's GPT-3.5-t
 - **Structured Weekly Insights** - 5 key questions with personalized answers
 - **Inline Summary Generation** - One-click weekly summary from main dashboard
 - **Enhanced Loading Animations** - Beautiful progress indicators for AI responses
+- **AI-Powered Task Planning** - Personalized daily plans based on energy, mood, and goals
+- **Enhanced AI Prompts** - Comprehensive task planning prompts with deep personalization
 
 For setup instructions, see [AI_SETUP.md](AI_SETUP.md).
 
@@ -350,6 +353,7 @@ All daily check-ins are automatically saved to `data/checkin_data.json` and pers
 - [x] **🎯 Personalized Greetings** - Time and context-aware interactions
 - [x] **💡 Fallback Intelligence** - Smart responses without external AI
 - [x] **🤖 OpenAI Integration** - AI-powered personalized responses
+- [x] **🎯 AI Task Planning** - Personalized daily plans based on energy, mood, and goals
 - [x] **💰 Usage Limits & Cost Control** - Predictable costs for beta testing
 - [x] **📊 Usage Tracking** - Real-time monitoring of AI usage
 - [x] **🔐 Enhanced Authentication** - Persistent sessions with "Remember me"

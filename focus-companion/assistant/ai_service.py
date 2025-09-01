@@ -40,6 +40,11 @@ class AIService:
         Check if a feature can be used based on limits
         Returns (allowed, reason)
         """
+        # Admin user bypass - unlimited access for testing
+        ADMIN_EMAIL = "joanapnpinto@gmail.com"
+        if user_email == ADMIN_EMAIL:
+            return True, "Admin user - unlimited access"
+        
         if not self.is_available():
             return False, "AI service not available"
         
@@ -458,4 +463,184 @@ class AIService:
             
         except Exception as e:
             st.error(f"Error generating weekly summary: {str(e)}")
+            return None
+
+    def generate_ai_task_plan(self, user_profile: Dict, checkin_data: Dict, mood_data: List[Dict], user_email: str = None) -> Dict:
+        """Generate AI-powered personalized task plan"""
+        # Check if we can use this feature
+        can_use, reason = self.can_use_feature("task_planning", user_email)
+        if not can_use:
+            st.warning(f"🤖 AI task planning limited: {reason}")
+            return None
+
+        # Prepare comprehensive context for the AI
+        current_time = datetime.now()
+        current_hour = current_time.hour
+        
+        # Determine time period
+        if 5 <= current_hour < 12:
+            time_period = "morning"
+        elif 12 <= current_hour < 18:
+            time_period = "afternoon"
+        else:
+            time_period = "evening"
+        
+        # Get recent context
+        recent_moods = mood_data[-3:] if mood_data else []
+        
+        # Handle checkin_data - it could be a list of all checkins or a single checkin dict
+        if isinstance(checkin_data, list):
+            recent_checkins = checkin_data[-2:] if checkin_data else []
+        else:
+            # If it's a single checkin dict, we don't have recent checkins for context
+            recent_checkins = []
+        
+        # Build comprehensive context
+        context = {
+            'time_period': time_period,
+            'current_hour': current_hour,
+            'user_goal': user_profile.get('goal', 'Improve focus and productivity'),
+            'user_tone': user_profile.get('tone', 'Friendly'),
+            'availability': user_profile.get('availability', '2-4 hours'),
+            'energy_drainers': user_profile.get('energy_drainers', []),
+            'joy_sources': user_profile.get('joy_sources', []),
+            'situation': user_profile.get('situation', 'Not specified'),
+            'small_habit': user_profile.get('small_habit', ''),
+            'current_checkin': checkin_data,
+            'recent_moods': recent_moods,
+            'recent_checkins': recent_checkins,
+            'all_checkins': checkin_data if isinstance(checkin_data, list) else [],
+            'focus_today': checkin_data.get('focus_today', 'Not specified'),
+            'energy_level': checkin_data.get('energy_level', 'Not specified'),
+            'current_feeling': checkin_data.get('current_feeling', 'Not specified'),
+            'sleep_quality': checkin_data.get('sleep_quality', 'Not specified'),
+            'day_progress': checkin_data.get('day_progress', 'Not specified')
+        }
+
+        # Check cache first
+        if user_email:
+            cached_response = ai_cache.get_cached_response("task_planning", user_email, context)
+            if cached_response:
+                try:
+                    import json
+                    return json.loads(cached_response)
+                except:
+                    pass
+
+        # Generate AI prompt for task planning
+        prompt = f"""
+You are an expert productivity coach and life strategist who creates deeply personalized, thoughtful daily plans. Your goal is to help users feel empowered, not overwhelmed, while making meaningful progress toward their goals.
+
+USER CONTEXT:
+- Primary Goal: {context['user_goal']}
+- Communication Style: {context['user_tone']}
+- Available Time: {context['availability']}
+- Current Time: {context['time_period']} ({current_hour}:00)
+- Life Situation: {context['situation']}
+
+CURRENT STATE ANALYSIS:
+- Sleep Quality: {checkin_data.get('sleep_quality', 'Not specified')}
+- Energy Level: {checkin_data.get('energy_level', 'Not specified')}
+- Emotional State: {checkin_data.get('current_feeling', 'Not specified')}
+- Day Progress: {checkin_data.get('day_progress', 'Not specified')}
+- Main Focus: {checkin_data.get('focus_today', 'Not specified')}
+
+PERSONAL PREFERENCES & PATTERNS:
+- Energy Drainers (Avoid): {context['energy_drainers']}
+- Joy Sources (Incorporate): {context['joy_sources']}
+- Small Habit: {context['small_habit']}
+- Recent Mood Pattern: {[m.get('mood', 'Unknown') for m in recent_moods]}
+- Recent Energy Pattern: {[c.get('energy_level', 'Unknown') for c in recent_checkins]}
+
+DEEP PLANNING APPROACH:
+1. **Energy-Aware Task Design**: Match task complexity to their current energy level
+2. **Emotional Intelligence**: Consider their emotional state and provide appropriate support
+3. **Goal Alignment**: Break down their main focus into manageable, meaningful steps
+4. **Joy Integration**: Weave in their joy sources naturally to boost motivation
+5. **Overwhelm Prevention**: Structure tasks to feel achievable, not daunting
+6. **Progress Momentum**: Design tasks that build on each other and create a sense of accomplishment
+7. **Flexibility**: Account for their availability and life situation
+
+TASK BREAKDOWN STRATEGY:
+- **High Energy + Good Sleep**: Focus on complex, creative, or challenging tasks
+- **Moderate Energy**: Mix of focused work and lighter activities
+- **Low Energy**: Gentle, restorative activities that still move them forward
+- **Poor Sleep**: Extra gentle approach with lots of self-care
+- **Stressed/Overwhelmed**: Focus on calming, grounding activities first
+- **Motivated/Accomplished**: Build on momentum with next-level tasks
+
+CREATE A PERSONALIZED {context['time_period'].upper()} PLAN THAT:
+1. **Deeply reflects their specific focus** - Break down their main goal into 3-5 thoughtful, actionable steps
+2. **Matches their energy perfectly** - Tasks should feel right for their current state
+3. **Incorporates their joy sources naturally** - Use what energizes them to boost motivation
+4. **Avoids their energy drainers** - Steer clear of what depletes them
+5. **Prevents overwhelm** - Structure tasks to feel achievable and satisfying
+6. **Builds momentum** - Each task should naturally lead to the next
+7. **Provides emotional support** - Consider their feelings and offer appropriate encouragement
+
+FORMAT: Return a JSON object with:
+{{
+    "tasks": [
+        "Specific, actionable task that directly relates to their focus",
+        "Next logical step that builds on the first",
+        "Task that incorporates their joy sources",
+        "Task that moves them toward their goal",
+        "Optional: Small habit or self-care task"
+    ],
+    "recommendations": [
+        "Specific advice for their current energy/emotional state",
+        "Strategy to avoid their energy drainers",
+        "Encouragement that matches their tone preference"
+    ],
+    "estimated_duration": "Realistic time estimate based on their availability",
+    "priority_order": "energy_based or goal_based",
+    "personalized_note": "Thoughtful, encouraging message that acknowledges their specific situation and feelings"
+}}
+
+IMPORTANT: Make each task specific to their stated focus. If they want to "work on project X," don't give generic tasks - break down what "working on project X" actually means for them right now. Consider their energy level, emotional state, and make the plan feel like it was crafted specifically for them in this moment.
+"""
+
+        try:
+            # Show enhanced loading feedback
+            with st.spinner(f"🤖 AI is crafting your personalized {context['time_period']} plan..."):
+                response = self.client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": "You are an expert productivity coach and life strategist with deep empathy and understanding of human psychology. You specialize in creating thoughtful, personalized daily plans that help people feel empowered and make meaningful progress without feeling overwhelmed. You understand that productivity is deeply personal and varies greatly based on energy, emotions, life circumstances, and individual preferences. Your goal is to craft plans that feel like they were made specifically for this person in this moment."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    max_tokens=600,
+                    temperature=0.7
+                )
+                
+                result = response.choices[0].message.content.strip()
+                
+                # Parse JSON response
+                try:
+                    import json
+                    task_plan = json.loads(result)
+                    
+                    # Cache the response
+                    if user_email:
+                        ai_cache.cache_response("task_planning", user_email, context, result)
+                    
+                    # Record the API call
+                    tokens_used = response.usage.total_tokens if response.usage else None
+                    cost_usd = (tokens_used * 0.000002) if tokens_used else None
+                    
+                    self.usage_limiter.record_api_call(
+                        user_email=user_email,
+                        feature="task_planning",
+                        tokens_used=tokens_used,
+                        cost_usd=cost_usd
+                    )
+                    
+                    return task_plan
+                    
+                except json.JSONDecodeError:
+                    st.error("Error parsing AI task plan response")
+                    return None
+                
+        except Exception as e:
+            st.error(f"Error generating AI task plan: {str(e)}")
             return None 

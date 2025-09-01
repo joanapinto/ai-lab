@@ -77,6 +77,11 @@ class UsageLimiter:
         Check if an API call can be made
         Returns (allowed, reason)
         """
+        # Admin user bypass - unlimited access for testing
+        ADMIN_EMAIL = "joanapnpinto@gmail.com"
+        if user_email == ADMIN_EMAIL:
+            return True, "Admin user - unlimited access"
+        
         # Get usage from database
         global_usage = self.db.get_global_api_usage(days=1)  # Today
         global_monthly = self.db.get_global_api_usage(days=30)  # This month
@@ -160,6 +165,7 @@ class UsageLimiter:
                     "encouragement": True,
                     "productivity_tip": True,
                     "weekly_summary": True,  # Enable weekly summaries
+                    "task_planning": True,  # Enable AI task planning
                     "mood_analysis": False,  # Disable expensive features
                     "focus_optimization": False,
                     "stress_management": False
