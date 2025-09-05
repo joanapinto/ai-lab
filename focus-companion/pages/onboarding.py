@@ -10,17 +10,74 @@ project_root = current_file.parent.parent
 sys.path.insert(0, str(project_root))
 
 from data.storage import save_user_profile, load_user_profile, reset_user_profile
-from auth import require_beta_access
+from auth import require_beta_access, get_user_email
 
-st.set_page_config(page_title="Focus Companion - Onboarding", page_icon="🧠")
+st.set_page_config(page_title="Humsy - Onboarding", page_icon="🧠")
+
+# Hide Streamlit's default navigation
+hide_streamlit_navigation = """
+<style>
+    /* Hide the automatic pages navigation */
+    .stSidebar > div:first-child > div:first-child > div:nth-child(2) {
+        display: none;
+    }
+    
+    /* Hide the default page navigation */
+    [data-testid="stSidebarNav"] {
+        display: none;
+    }
+    
+    /* Hide any remaining automatic navigation */
+    .css-1544g2n {
+        display: none;
+    }
+</style>
+"""
+st.markdown(hide_streamlit_navigation, unsafe_allow_html=True)
+
+# Custom navigation sidebar
+with st.sidebar:
+    st.subheader("🧭 Navigation")
+    
+    # Main pages
+    if st.button("🏠 Home", use_container_width=True):
+        st.switch_page("app.py")
+    
+    if st.button("👤 Profile", use_container_width=True):
+        st.switch_page("pages/profile.py")
+    
+    if st.button("📝 Daily Check-in", use_container_width=True):
+        st.switch_page("pages/daily_checkin.py")
+    
+    if st.button("🌱 Weekly Reflection", use_container_width=True):
+        st.switch_page("pages/reflection.py")
+    
+    if st.button("📊 Insights", use_container_width=True):
+        st.switch_page("pages/history.py")
+    
+    st.write("---")
+    
+    # Admin insights access
+    user_email = get_user_email()
+    if user_email == "joanapnpinto@gmail.com":
+        st.subheader("🔓 Admin Tools")
+        if st.button("📊 Database Insights", use_container_width=True):
+            st.switch_page("pages/insights.py")
+    
+    st.write("---")
+    
+    # Logout
+    if st.button("🚪 Logout", use_container_width=True):
+        from auth import logout
+        logout()
 
 # Require beta access
 require_beta_access()
 
-st.title("🧠 Welcome to Your Focus Companion")
+st.title("🧠 Welcome to Your Humsy")
 
 # Beta tester welcome message
-st.success("🎉 **Welcome to Focus Companion Beta!**")
+st.success("🎉 **Welcome to Humsy Beta!**")
 st.info("💡 **Pro Tip:** Take your time with these questions - they help the AI provide personalized insights!")
 
 # Load existing profile if available
@@ -213,7 +270,7 @@ if submitted:
     
     # Feedback prompt after onboarding completion
     st.write("---")
-    st.subheader("🎉 Welcome to Focus Companion!")
+    st.subheader("🎉 Welcome to Humsy!")
     st.write("You're all set up! How was the onboarding experience?")
     
     col1, col2, col3 = st.columns(3)

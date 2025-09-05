@@ -91,7 +91,16 @@ class FallbackAssistant:
             return "💡 Log your mood regularly to see how it affects your focus and productivity!"
         
         # Calculate average mood intensity
-        avg_intensity = sum(m['intensity'] for m in recent_moods) / len(recent_moods)
+        # Handle both old format (with intensity) and new format (without intensity)
+        intensities = []
+        for m in recent_moods:
+            if 'intensity' in m:
+                intensities.append(m['intensity'])
+            else:
+                # For new format without intensity, use a default value
+                intensities.append(5)  # Default neutral mood intensity
+        
+        avg_intensity = sum(intensities) / len(intensities) if intensities else 5
         
         if avg_intensity >= 7:
             return "🎉 Your mood has been positive recently! This is great for maintaining focus and productivity."

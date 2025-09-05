@@ -1,5 +1,5 @@
 """
-Authentication module for Focus Companion beta access
+Authentication module for Humsy beta access
 This module provides shared authentication logic for all pages
 """
 
@@ -9,7 +9,6 @@ import os
 from pathlib import Path
 
 # Load allowed emails from file
-@st.cache_data
 def load_whitelist():
     """Load the list of allowed email addresses"""
     try:

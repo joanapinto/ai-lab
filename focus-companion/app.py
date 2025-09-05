@@ -24,95 +24,77 @@ from auth import require_beta_access, get_user_email, logout
 
 # Set page config
 st.set_page_config(
-    page_title="Focus Companion",
+    page_title="Humsy",
     page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# Hide Streamlit's default navigation
+hide_streamlit_navigation = """
+<style>
+    /* Hide the automatic pages navigation */
+    .stSidebar > div:first-child > div:first-child > div:nth-child(2) {
+        display: none;
+    }
+    
+    /* Hide the default page navigation */
+    [data-testid="stSidebarNav"] {
+        display: none;
+    }
+    
+    /* Hide any remaining automatic navigation */
+    .css-1544g2n {
+        display: none;
+    }
+</style>
+"""
+st.markdown(hide_streamlit_navigation, unsafe_allow_html=True)
 
 # Require beta access for the main app
 require_beta_access()
 
 # Main app logic
 def main():
-    # Add logout option to sidebar
+    # Main navigation sidebar
     with st.sidebar:
+        st.subheader("🧭 Navigation")
+        
+        # Main pages
+        if st.button("🏠 Home", use_container_width=True):
+            st.switch_page("app.py")
+        
+        if st.button("👤 Profile", use_container_width=True):
+            st.switch_page("pages/profile.py")
+        
+        if st.button("📝 Daily Check-in", use_container_width=True):
+            st.switch_page("pages/daily_checkin.py")
+        
+        if st.button("😊 Mood Tracker", use_container_width=True):
+            st.switch_page("pages/mood_tracker.py")
+        
+        if st.button("🌱 Weekly Reflection", use_container_width=True):
+            st.switch_page("pages/reflection.py")
+        
+        if st.button("📊 Insights", use_container_width=True):
+            st.switch_page("pages/history.py")
+        
         st.write("---")
-        if st.button("🚪 Logout", use_container_width=True):
-            logout()
         
         # Admin insights access
         user_email = get_user_email()
         if user_email == "joanapnpinto@gmail.com":
-            st.write("---")
             st.subheader("🔓 Admin Tools")
             if st.button("📊 Database Insights", use_container_width=True):
                 st.switch_page("pages/insights.py")
         
-        # Feedback section
         st.write("---")
-        st.subheader("💬 Feedback")
-        st.write("Help us improve Focus Companion!")
         
-        # Feedback button
-        if st.button("📝 Give Feedback", use_container_width=True):
-            st.markdown("""
-            ### 📝 We'd love your feedback!
-            
-            Please take a moment to share your thoughts about Focus Companion:
-            
-            **[📋 Open Feedback Form](https://tally.so/r/mBr11Q)**
-            
-            Your feedback helps us make the app better for everyone! 🚀
-            """)
-        
-        # Beta tester guide
-        if st.button("📋 Beta Tester Guide", use_container_width=True):
-            st.markdown("""
-            ### 🚀 **Beta Tester Guide**
-            
-            **🎯 Quick Start:**
-            1. **Start with a morning check-in** - It's the heart of the app!
-            2. **Track your mood** - Build patterns and insights
-            3. **Try the AI features** - Personalized greetings and tips
-            4. **Explore weekly reflections** - Learn from your patterns
-            
-            **💡 Pro Tips:**
-            - **Be consistent** - Daily check-ins build the most valuable insights
-            - **Use the AI features** - They get smarter with your data
-            - **Don't worry about perfection** - Just log how you're feeling
-            - **Try different times** - Morning, afternoon, and evening check-ins
-            
-            **🤖 AI Features:**
-            - **Personalized greetings** - AI that knows your patterns
-            - **Smart task planning** - Based on your energy and goals
-            - **Usage limits** - 20 AI calls per day, 400 per month
-            - **Graceful fallback** - Works perfectly even without AI
-            
-            **⚠️ Beta Expectations:**
-            - This is a **beta version** - some things might change
-            - **AI features** have usage limits to control costs
-            - **Data is saved locally** - your privacy is protected
-            - **Updates** will add new features based on your feedback
-            
-            **🎁 Beta Perks:**
-            - **Early access** to new features
-            - **Direct influence** on development
-            - **Priority support** for issues
-            - **Exclusive insights** into the development process
-            """)
-        
-        # Quick feedback options
-        st.write("**Quick feedback:**")
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("👍", help="I like this feature"):
-                st.success("Thanks for the feedback! 🙏")
-        with col2:
-            if st.button("👎", help="This needs improvement"):
-                st.info("We'd love to hear more details in the feedback form above! 📝")
+        # Logout
+        if st.button("🚪 Logout", use_container_width=True):
+            logout()
     
-    st.title("🧠 Focus Companion")
+    st.title("🧠 Humsy")
     
     # Check if user has completed onboarding
     user_profile = load_user_profile()
@@ -123,31 +105,45 @@ def main():
         if "beta_welcome_shown" not in st.session_state:
             st.session_state.beta_welcome_shown = True
             
-            st.success("🎉 **Welcome to Focus Companion Beta!**")
+            st.success("🎉 **Welcome to Humsy Beta!**")
             
             with st.expander("📋 Beta Tester Guide", expanded=True):
                 st.markdown("""
                 ### 🚀 **Welcome, Beta Tester!**
                 
-                You're among the first to try Focus Companion! Here's how to get the most value:
+                You're among the first to try Humsy! Here's how to get the most value:
                 
                 **🎯 Quick Start:**
                 1. **Start with a morning check-in** - It's the heart of the app!
-                2. **Track your mood** - Build patterns and insights
-                3. **Try the AI features** - Personalized greetings and tips
+                2. **Track your mood** - Enhanced mood tracking with multiple emotions and reasons
+                3. **Try the AI features** - Personalized greetings and smart task planning
                 4. **Explore weekly reflections** - Learn from your patterns
+                5. **Use the sidebar navigation** - Easy access to all features
                 
                 **💡 Pro Tips:**
                 - **Be consistent** - Daily check-ins build the most valuable insights
+                - **Track multiple moods** - You can feel happy AND calm at the same time!
+                - **Add reasons for your moods** - Helps identify patterns and triggers
                 - **Use the AI features** - They get smarter with your data
                 - **Don't worry about perfection** - Just log how you're feeling
-                - **Try different times** - Morning, afternoon, and evening check-ins
+                
+                **😊 Enhanced Mood Tracking:**
+                - **Multiple emotions** - Select several moods that describe how you feel
+                - **Mood reasons** - Track what's influencing your emotions
+                - **Visual analytics** - See your mood patterns over time
+                - **Smart insights** - AI-powered mood analysis and recommendations
                 
                 **🤖 AI Features:**
-                - **Personalized greetings** - AI that knows your patterns
-                - **Smart task planning** - Based on your energy and goals
+                - **Personalized greetings** - AI that knows your patterns and mood trends
+                - **Smart task planning** - Based on your energy, mood, and goals
+                - **Mood analysis** - Insights into your emotional patterns
                 - **Usage limits** - 20 AI calls per day, 400 per month
                 - **Graceful fallback** - Works perfectly even without AI
+                
+                **🧭 Navigation:**
+                - **Sidebar menu** - Quick access to all features
+                - **Mood Tracker** - Dedicated button between Daily Check-in and Weekly Reflection
+                - **Consistent experience** - Same navigation across all pages
                 
                 **📝 Feedback:**
                 - **Share your thoughts** - Use the feedback forms throughout the app
@@ -159,12 +155,14 @@ def main():
                 - **AI features** have usage limits to control costs
                 - **Data is saved locally** - your privacy is protected
                 - **Updates** will add new features based on your feedback
+                - **Recent improvements** - Fixed data compatibility and enhanced mood tracking
                 
                 **🎁 Beta Perks:**
                 - **Early access** to new features
                 - **Direct influence** on development
                 - **Priority support** for issues
                 - **Exclusive insights** into the development process
+                - **Enhanced mood tracking** - More detailed emotional insights
                 """)
                 
                 # Quick action buttons
@@ -206,12 +204,16 @@ def main():
         # User goal and progress
         col1, col2 = st.columns([2, 1])
         with col1:
-            st.write(f"**Your Goal:** {user_profile.get('goal', 'Not set')}")
+            current_goal = user_profile.get('goal', 'Not set')
+            st.write(f"**Your Goal:** {current_goal}")
+            if st.button("✏️ Want to change?", use_container_width=True):
+                st.switch_page("pages/profile.py")
         with col2:
             # Calculate weekly consistency
             week_checkins = [c for c in checkin_data if (datetime.now() - datetime.fromisoformat(c['timestamp'])).days <= 7]
             consistency = len(set([datetime.fromisoformat(c['timestamp']).date() for c in week_checkins])) / 7 * 100
             st.metric("Weekly Consistency", f"{consistency:.0f}%")
+            st.caption("📊 % of days you checked in this week")
         
         # Personalized greeting with enhanced styling
         greeting = assistant.get_personalized_greeting()
@@ -292,6 +294,15 @@ def main():
             tip = assistant.get_productivity_tip()
             if tip:
                 st.info(f"💡 **Today's Tip:** {tip}")
+                # Add expander for longer tips
+                if len(tip) > 100:
+                    with st.expander("📖 Read full tip"):
+                        st.write(tip)
+        
+        # Daily reminder right after insights
+        st.write("---")
+        st.subheader("💭 Daily Reminder")
+        st.info("🌟 **Remember:** Small steps lead to big changes. Every check-in brings you closer to your goals!")
         
         # Quick Actions with Progress Indicators
         st.write("---")
@@ -301,7 +312,7 @@ def main():
         today_checkins = [c for c in checkin_data if datetime.fromisoformat(c['timestamp']).date() == datetime.now().date()]
         today_moods = [m for m in mood_data if datetime.fromisoformat(m['timestamp']).date() == datetime.now().date()]
         
-        col1, col2, col3, col4, col5 = st.columns(5)
+        col1, col2, col3, col4 = st.columns(4)
         
         with col1:
             checkin_status = "✅ Complete" if today_checkins else "📝 Pending"
@@ -320,13 +331,8 @@ def main():
                 st.switch_page("pages/weekly_summary.py")
         
         with col4:
-            # Generate weekly summary button
-            if st.button("🤖 Generate AI Summary", use_container_width=True):
-                generate_weekly_summary_inline(user_email, user_profile, mood_data, checkin_data)
-        
-        with col5:
-            # Placeholder for insights button - will be populated after user_email is defined
-            st.button("📈 View Insights", use_container_width=True, disabled=True, help="Loading...")
+            if st.button("📈 View Insights", use_container_width=True):
+                st.switch_page("pages/history.py")
         
         # Show usage stats if user is logged in
         user_email = get_user_email()
@@ -352,13 +358,17 @@ def main():
                     daily_used = stats["global"]["daily_used"]
                     daily_limit = stats["global"]["daily_limit"]
                     st.metric("Daily API Calls", f"{daily_used}/{daily_limit}")
-                    st.progress(daily_used / daily_limit)
+                    # Cap progress at 1.0 to avoid Streamlit error
+                    progress_value = min(daily_used / daily_limit, 1.0)
+                    st.progress(progress_value)
                 
                 with col2:
                     monthly_used = stats["global"]["monthly_used"]
                     monthly_limit = stats["global"]["monthly_limit"]
                     st.metric("Monthly API Calls", f"{monthly_used}/{monthly_limit}")
-                    st.progress(monthly_used / monthly_limit)
+                    # Cap progress at 1.0 to avoid Streamlit error
+                    progress_value = min(monthly_used / monthly_limit, 1.0)
+                    st.progress(progress_value)
                 
                 with col3:
                     total_cost = stats["global"]["total_cost"]
@@ -416,31 +426,6 @@ def main():
                         pass  # Silently fail if cache not available
         
 
-        
-        # Feedback section on main dashboard
-        st.write("---")
-        st.subheader("💬 Help Us Improve Focus Companion")
-        
-        col_feedback1, col_feedback2, col_feedback3 = st.columns(3)
-        
-        with col_feedback1:
-            st.info("**How's your experience?**")
-            st.write("We'd love to hear your thoughts!")
-        
-        with col_feedback2:
-            if st.button("📝 Share Feedback", use_container_width=True, type="primary"):
-                st.markdown("""
-                ### 📝 Thank you for wanting to help!
-                
-                **[📋 Open Feedback Form](https://tally.so/r/mBr11Q)**
-                
-                Your feedback is invaluable for making Focus Companion better! 🚀
-                """)
-        
-        with col_feedback3:
-            st.success("**Beta Tester Perks**")
-            st.write("Early access to new features!")
-            st.write("Direct influence on development!")
 
 def display_gpt_quota_badge(user_email):
     """Display GPT quota usage badge"""

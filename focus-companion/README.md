@@ -1,4 +1,4 @@
-# 🧠 Focus Companion
+# 🧠 Humsy
 
 > Your personal AI-powered focus and wellness assistant
 
@@ -17,39 +17,61 @@ Time-based check-in flows that adapt to your day with persistent data storage:
   - Sleep quality assessment
   - Daily focus planning
   - Energy level evaluation
-  - **Persistent storage** - All check-ins saved permanently
+  - Current feeling tracking
+  - **AI-Powered Task Planning** - Personalized daily plans based on your energy, mood, and goals
 
 - **☀️ Afternoon (12 PM - 6 PM)**
   - Day progress tracking
   - Plan adjustment suggestions
   - Break reminders
+  - Energy level and focus assessment
   - **Data continuity** - Build complete daily patterns
 
 - **🌆 Evening (6 PM - 5 AM)**
   - Accomplishment review
   - Challenge identification
   - End-of-day reflection
+  - Tomorrow's focus planning
   - **Historical tracking** - Review progress over time
 
 ### 😊 **Mood Tracker & Analytics**
 Comprehensive emotional wellness monitoring with persistent data storage:
 
-- **📊 Visual Analytics**
-  - Mood intensity trends over time
-  - Mood distribution charts
-  - Interactive Plotly visualizations
-
-- **📝 Quick Mood Logging**
-  - Emoji-based mood selection
-  - Intensity rating (1-10 scale)
-  - Optional notes and context
+- **📝 Enhanced Mood Logging** - **NEW: Multiple moods + reasons tracking**
+  - **Multiple mood selection** - Choose all emotions you're feeling
+  - **Predefined reasons** - Context-aware options for each mood
+  - **Custom reason input** - Add your own reasons when needed
+  - **Beautiful gradient-styled form** positioned above analytics
   - **Persistent data storage** - Your mood history is saved permanently
 
+- **📊 Advanced Analytics**
+  - **Mood distribution** - See which emotions you experience most
+  - **Mood frequency over time** - Track emotional patterns
+  - **Reasons analysis** - Understand what triggers each mood
+  - **Mood-reason correlations** - Discover patterns in your emotional landscape
+  - Interactive Plotly visualizations with enhanced insights
+
 - **📈 Smart Insights**
-  - Daily and weekly mood averages
-  - Pattern recognition
-  - Progress tracking
-  - Historical trend analysis
+  - **Top reasons analysis** - Most common triggers for your moods
+  - **Pattern recognition** - Understand your emotional patterns
+  - **Progress tracking** - Monitor your emotional wellness journey
+  - **Historical trend analysis** - See how your emotional landscape evolves
+
+- **🎯 Context-Aware Reasons System**
+  - **10 emotion categories** with tailored reason options
+  - **Smart suggestions** based on your selected mood
+  - **Custom input** for unique situations
+  - **Mood-reason mapping** for deeper emotional understanding
+  - **Pattern discovery** to identify emotional triggers
+
+### 👤 **User Profile Management** - **NEW FEATURE**
+Comprehensive profile system for personalization:
+
+- **🎯 Editable Goals** - Update your main focus anytime
+- **📝 Onboarding Answers** - Review and edit your initial setup
+- **💬 Feedback Integration** - Direct access to feedback forms
+- **📋 Beta Tester Guide** - Comprehensive guide for new users
+- **🔧 Profile Statistics** - Track your wellness journey
 
 ### 📖 **Mood Journal**
 Comprehensive journaling system for reviewing and analyzing your wellness journey:
@@ -71,7 +93,6 @@ Comprehensive journaling system for reviewing and analyzing your wellness journe
 
 - **📤 Export Capabilities**
   - JSON export for data analysis
-  - CSV export for spreadsheet analysis
   - Timestamped files for organization
 
 ### 🤔 **Weekly Reflections**
@@ -81,26 +102,28 @@ Structured reflection system for continuous improvement:
 - Challenge identification
 - Learning capture
 - Next week planning
+- **AI Summary** - Optional AI-generated insights
 
-### 📊 **Progress History**
-Comprehensive tracking and visualization:
+### 📊 **Insights & Analytics** - **RENAMED & ENHANCED**
+Comprehensive tracking and visualization (formerly "History"):
 
-- User profile management
-- Goal tracking
-- Historical data review
-- Progress patterns
+- **📈 Overview Dashboard** - Profile info and recent activity
+- **😊 Mood Analytics** - Trends, time patterns, and insights
+- **📝 Check-in Insights** - Frequency and energy level analysis
+- **📖 Journal by Month** - Organized monthly journal entries
+- **🔍 Reflection Archive** - Complete reflection history
 
-### 🎨 **User Experience**
-- **Clean, intuitive interface** with emoji-rich design
-- **Responsive layout** that works on all devices
-- **Time-aware interactions** that adapt to your schedule
-- **Data export** functionality for personal analysis
-- **🧠 Intelligent Assistant** with personalized insights and recommendations
-- **🎯 Smart Recommendations** based on your patterns and preferences
-- **🤖 AI-Powered Greetings** with OpenAI integration for personalized responses
+### 🎨 **User Experience & Navigation** - **MAJORLY IMPROVED**
+- **🧭 Custom Navigation Menu** - Clean, organized sidebar navigation
+- **🏠 Streamlined Dashboard** - Focused home page with essential features
+- **📱 Minimalist Design** - Reduced visual clutter and improved aesthetics
+- **🎯 Quick Actions** - Easy access to daily check-in, mood logging, and weekly reflection
 - **🔐 Persistent Authentication** with "Remember me" functionality
 - **📊 Usage Tracking** with real-time AI usage statistics
 - **💬 Integrated Feedback System** for beta testing and improvements
+- **🧠 Intelligent Assistant** with personalized insights and recommendations
+- **🎯 Smart Recommendations** based on your patterns and preferences
+- **🤖 AI-Powered Greetings** with OpenAI integration for personalized responses
 
 ### ⚡ **AI Optimization & Performance**
 - **🧠 Smart Caching System** - Avoids redundant API calls for similar inputs
@@ -137,6 +160,12 @@ Comprehensive tracking and visualization:
 4. **Open your browser**
    Navigate to `http://localhost:8501`
 
+### 🧭 **New Navigation Structure**
+- **Custom Sidebar**: Clean, organized navigation replacing Streamlit's default
+- **Page Organization**: Logical flow from Home → Profile → Daily Check-in → Weekly Reflection → Insights
+- **Quick Actions**: Easy access to essential features from the dashboard
+- **Consistent Experience**: Same navigation available on all pages
+
 ## 📱 Usage Guide
 
 ### First Time Setup
@@ -144,17 +173,25 @@ Comprehensive tracking and visualization:
 2. **Choose Your Tone**: Select your preferred assistant communication style
 3. **Set Your Situation**: Define your current life circumstances
 
+### Navigation & Pages
+- **🏠 Home**: Streamlined dashboard with quick actions and AI insights
+- **👤 Profile**: Manage your goals, review onboarding answers, and access feedback
+- **📝 Daily Check-in**: Time-based check-ins with AI-powered task planning
+- **🌱 Weekly Reflection**: Weekly progress review and planning
+- **📊 Insights**: Comprehensive analytics and mood patterns (formerly History)
+
 ### Daily Usage
-1. **Morning Check-in**: Start your day with sleep and energy assessment
+1. **Morning Check-in**: Start your day with sleep, energy, and focus assessment
 2. **Afternoon Review**: Mid-day progress check and plan adjustments
-3. **Evening Reflection**: End-of-day accomplishment review
-4. **Mood Tracking**: Log your emotions throughout the day
+3. **Evening Reflection**: End-of-day accomplishment review and tomorrow's planning
+4. **Mood Tracking**: Log your emotions with the beautiful new form above graphs
 5. **Data Persistence**: All your data is automatically saved and persists across sessions
 
 ### Weekly Review
 - **Reflection Sessions**: Weekly deep-dive into your progress
 - **Pattern Analysis**: Review mood and focus trends
 - **Goal Adjustment**: Update objectives based on insights
+- **AI Summary**: Optional AI-generated weekly insights
 
 ## 🏗️ Architecture
 
@@ -163,12 +200,14 @@ focus-companion/
 ├── app.py                 # Main Streamlit application
 ├── auth.py                # Beta access control & authentication
 ├── pages/                 # Application pages
+│   ├── profile.py         # NEW: User profile management & editing
 │   ├── onboarding.py      # User profile setup with feedback
 │   ├── daily_checkin.py   # Time-based check-ins with AI task planning
-│   ├── mood_tracker.py    # Emotion tracking & analytics
+│   ├── mood_tracker.py    # Enhanced emotion tracking & analytics
 │   ├── mood_journal.py    # Comprehensive journaling system
 │   ├── reflection.py      # Weekly reflections
-│   └── history.py         # Progress history
+│   ├── history.py         # RENAMED: Insights & analytics
+│   └── insights.py        # Admin database insights
 ├── data/                  # Data storage
 │   ├── database.py        # SQLite database manager
 │   ├── storage.py         # Hybrid JSON/SQLite storage
@@ -225,6 +264,14 @@ Focus Companion now includes AI-powered personalization using OpenAI's GPT-3.5-t
 - Personalized recommendations for your available time
 - Considers your recent mood patterns for relevant advice
 
+### **🚀 AI-Powered Task Planning** - **NEW FEATURE**
+- **Personalized Daily Plans** based on your energy, mood, and goals
+- **Deep Personalization** considering how you feel, what you need to do, and your motivations
+- **Overwhelm Prevention** with smart task breakdown strategies
+- **Energy-Aware Design** that adapts to your current energy levels
+- **Emotional Intelligence** that considers your feelings and stress triggers
+- **Context-Aware Recommendations** based on your recent patterns and goals
+
 ### **🔄 Graceful Fallback**
 - Seamless fallback to rule-based responses when AI is unavailable
 - No interruption to your experience
@@ -242,6 +289,7 @@ Focus Companion now includes AI-powered personalization using OpenAI's GPT-3.5-t
 - **Feature control** - can disable expensive AI features
 - **Transparent usage stats** - users can see their AI usage
 - **Predictable costs** - maximum $4/month for 5 beta testers
+- **Smart fallback** - graceful degradation when limits are reached
 
 ### **📝 Beta Testing Features**
 - **Integrated feedback system** with Tally form integration
@@ -315,8 +363,11 @@ For setup instructions, see [AI_SETUP.md](AI_SETUP.md).
 ```json
 {
   "timestamp": "2024-01-15T10:30:00",
-  "mood": "😊 Happy",
-  "intensity": 8,
+  "moods": ["😊 Happy", "💪 Confident"],
+  "reasons": {
+    "😊 Happy": ["A win or achievement", "Productive day"],
+    "💪 Confident": ["Solved a problem", "Completed a task"]
+  },
   "note": "Feeling productive today!",
   "date": "2024-01-15",
   "time": "10:30"
@@ -336,6 +387,26 @@ For setup instructions, see [AI_SETUP.md](AI_SETUP.md).
 
 ### Check-in Data Storage
 All daily check-ins are automatically saved to `data/checkin_data.json` and persist across sessions.
+
+## 🎉 **Major Update - December 2024** 
+
+### **🚀 What's New Today:**
+- **🏷️ App Rebranding**: "Focus Companion" → **"Humsy"** - A fresh, memorable name for your wellness journey
+- **🧭 Custom Navigation**: Beautiful, organized sidebar navigation replacing Streamlit's default
+- **👤 Profile Page**: New dedicated page for managing goals, onboarding answers, and feedback
+- **📝 Enhanced Mood Tracker**: Quick mood logging moved above graphs with beautiful gradient styling
+- **🎨 UI/UX Overhaul**: Minimalist design with reduced clutter and improved aesthetics
+- **🏠 Streamlined Dashboard**: Cleaner home page focused on essential features
+- **📊 Page Restructuring**: Better information architecture and user flow
+
+### **💡 Key Improvements:**
+- **Better User Experience**: More intuitive navigation and cleaner interface
+- **Enhanced Mood Tracking**: Prominent mood logging with beautiful visual design
+- **Improved Profile Management**: Easy access to edit goals and review onboarding
+- **Consistent Design**: Unified styling across all pages and components
+- **Mobile-First Approach**: Better responsive design for all devices
+
+---
 
 ## 🔮 Roadmap
 
@@ -359,12 +430,22 @@ All daily check-ins are automatically saved to `data/checkin_data.json` and pers
 - [x] **🔐 Enhanced Authentication** - Persistent sessions with "Remember me"
 - [x] **💬 Feedback Integration** - Tally form integration for beta testing
 
+### Phase 2.5: UI/UX Overhaul ✅ - **COMPLETED TODAY**
+- [x] **🏷️ App Renaming** - Rebranded from "Focus Companion" to "Humsy"
+- [x] **🧭 Custom Navigation** - Replaced Streamlit's default navigation with clean sidebar
+- [x] **👤 Profile Page** - New dedicated profile management page
+- [x] **📝 Enhanced Mood Tracker** - Moved quick mood log above graphs with beautiful styling
+- [x] **📊 Page Restructuring** - Reorganized pages and improved information architecture
+- [x] **🎨 Minimalist Design** - Reduced visual clutter and improved aesthetics
+- [x] **🏠 Streamlined Dashboard** - Cleaner home page with focused quick actions
+- [x] **🎯 Advanced Mood Tracking** - Multiple moods + context-aware reasons system
+
 ### Phase 3: Advanced Features 📋
-- [ ] Habit tracking integration
-- [ ] Goal achievement metrics
-- [ ] Social sharing capabilities
-- [ ] Mobile app development
-- [ ] Database integration
+- [ ] **🧠 Enhanced AI Task Planning** - Further improvements to personalization and overwhelm prevention
+- [ ] **📱 Mobile App Development** - Native mobile application
+- [ ] **🎯 Advanced Goal Tracking** - Goal achievement metrics and progress visualization
+- [ ] **📊 Enhanced Analytics** - More sophisticated pattern recognition and insights
+- [ ] **🔔 Smart Notifications** - Intelligent reminders based on your patterns
 - [ ] **🧠 Emotional Trends Reports**
   - AI-powered pattern recognition
   - Personalized insights like "You're most energized on Tuesdays after 9h sleep"
@@ -391,6 +472,7 @@ All daily check-ins are automatically saved to `data/checkin_data.json` and pers
 
 - **Streamlit** for the amazing web app framework
 - **Plotly** for beautiful data visualizations
-- **OpenAI** for AI capabilities (planned)
+- **OpenAI** for AI capabilities and GPT-3.5-turbo integration
 - **The open-source community** for inspiration and tools
+- **Beta Testers** for valuable feedback and feature suggestions
 

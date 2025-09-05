@@ -1,6 +1,6 @@
 # 🤖 AI Features Setup Guide
 
-The Focus Companion app now includes AI-powered personalized greetings and responses! Here's how to enable them.
+The Humsy app now includes AI-powered personalized greetings and responses! Here's how to enable them.
 
 ## 🚀 Quick Setup
 
@@ -92,4 +92,4 @@ Once you've set up your API key, the app will automatically:
 - Give tailored productivity tips
 - Fall back gracefully if AI is unavailable
 
-Your Focus Companion will feel more personal and responsive than ever! 🚀 
+Your Humsy will feel more personal and responsive than ever! 🚀 

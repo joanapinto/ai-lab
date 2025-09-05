@@ -80,13 +80,23 @@ class AIService:
         recent_moods = mood_data[-3:] if mood_data else []
         mood_summary = ""
         if recent_moods:
-            avg_mood = sum(m['intensity'] for m in recent_moods) / len(recent_moods)
-            if avg_mood >= 7:
-                mood_summary = "You've been in a positive mood recently"
-            elif avg_mood >= 5:
-                mood_summary = "Your mood has been stable"
-            else:
-                mood_summary = "You've been experiencing some challenges"
+            # Handle both old format (with intensity) and new format (without intensity)
+            intensities = []
+            for m in recent_moods:
+                if 'intensity' in m:
+                    intensities.append(m['intensity'])
+                else:
+                    # For new format without intensity, use a default value
+                    intensities.append(5)  # Default neutral mood intensity
+            
+            if intensities:
+                avg_mood = sum(intensities) / len(intensities)
+                if avg_mood >= 7:
+                    mood_summary = "You've been in a positive mood recently"
+                elif avg_mood >= 5:
+                    mood_summary = "Your mood has been stable"
+                else:
+                    mood_summary = "You've been experiencing some challenges"
         
         # Get recent check-in patterns
         recent_checkins = checkin_data[-2:] if checkin_data else []
@@ -549,7 +559,7 @@ PERSONAL PREFERENCES & PATTERNS:
 - Energy Drainers (Avoid): {context['energy_drainers']}
 - Joy Sources (Incorporate): {context['joy_sources']}
 - Small Habit: {context['small_habit']}
-- Recent Mood Pattern: {[m.get('mood', 'Unknown') for m in recent_moods]}
+- Recent Mood Pattern: {[', '.join(m.get('moods', [m.get('mood', 'Unknown')])) for m in recent_moods]}
 - Recent Energy Pattern: {[c.get('energy_level', 'Unknown') for c in recent_checkins]}
 
 DEEP PLANNING APPROACH:

@@ -489,7 +489,7 @@ PERSONAL PREFERENCES & PATTERNS:
 - Energy Drainers (Avoid): {context.get('energy_drainers', [])}
 - Joy Sources (Incorporate): {context.get('joy_sources', [])}
 - Small Habit: {context.get('small_habit', '')}
-- Recent Mood Pattern: {[m.get('mood', 'Unknown') for m in recent_moods]}
+- Recent Mood Pattern: {[', '.join(m.get('moods', [m.get('mood', 'Unknown')])) for m in recent_moods]}
 - Recent Energy Pattern: {[c.get('energy_level', 'Unknown') for c in recent_checkins]}
 
 DEEP PLANNING APPROACH:
