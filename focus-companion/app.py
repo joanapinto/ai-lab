@@ -81,6 +81,18 @@ def main():
         
         st.write("---")
         
+        # Feedback section
+        st.subheader("💬 Feedback")
+        if st.button("📝 Give Feedback", use_container_width=True):
+            st.markdown("**[📋 Open Feedback Form](https://tally.so/r/mBr11Q)**")
+            st.info("Your feedback helps us make Humsy better for everyone! 🚀")
+        
+        if st.button("🐛 Report Bug", use_container_width=True):
+            st.markdown("**[🐛 Open Bug Report Form](https://tally.so/r/waR7Eq)**")
+            st.info("🐛 **Bug Report**\n\nPlease detail step by step how to reproduce the bug. Include:\n- What you were trying to do\n- What happened instead\n- Steps to reproduce")
+        
+        st.write("---")
+        
         # Admin insights access
         user_email = get_user_email()
         if user_email == "joanapnpinto@gmail.com":

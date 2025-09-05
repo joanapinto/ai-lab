@@ -238,7 +238,8 @@ def main():
     
     with col2:
         if st.button("🐛 Report Bug", use_container_width=True):
-            st.info("🐛 **Bug Report**\n\nPlease use the feedback form above and mention it's a bug report. Include:\n- What you were trying to do\n- What happened instead\n- Steps to reproduce")
+            st.markdown("**[🐛 Open Bug Report Form](https://tally.so/r/waR7Eq)**")
+            st.info("🐛 **Bug Report**\n\nPlease detail step by step how to reproduce the bug. Include:\n- What you were trying to do\n- What happened instead\n- Steps to reproduce")
     
     with col3:
         if st.button("💡 Suggest Feature", use_container_width=True):

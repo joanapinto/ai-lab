@@ -328,28 +328,111 @@ else:
             
             # Mood distribution
             mood_counts = df_expanded['mood'].value_counts()
+            
+            # Define beautiful colors for different moods
+            mood_colors = {
+                "😊 Happy": "#FFD700",      # Gold
+                "😌 Calm": "#87CEEB",       # Sky Blue
+                "😤 Stressed": "#FF6B6B",   # Coral Red
+                "😴 Tired": "#9370DB",      # Medium Purple
+                "😡 Angry": "#DC143C",      # Crimson
+                "😔 Sad": "#4169E1",        # Royal Blue
+                "😰 Anxious": "#FF8C00",    # Dark Orange
+                "🤗 Excited": "#32CD32",    # Lime Green
+                "😐 Neutral": "#808080",    # Gray
+                "💪 Confident": "#FF1493"   # Deep Pink
+            }
+            
+            # Create color list for the pie chart
+            colors = [mood_colors.get(mood, "#CCCCCC") for mood in mood_counts.index]
+            
             fig_dist = px.pie(
                 values=mood_counts.values,
                 names=mood_counts.index,
-                title="Mood Distribution"
+                title="📊 Your Mood Distribution",
+                color_discrete_sequence=colors,
+                hole=0.3  # Create a donut chart
             )
-            fig_dist.update_layout(height=400)
+            
+            # Improve styling
+            fig_dist.update_layout(
+                height=450,
+                font=dict(size=12),
+                title_font=dict(size=18, color="#2E86AB"),
+                showlegend=True,
+                legend=dict(
+                    orientation="v",
+                    yanchor="middle",
+                    y=0.5,
+                    xanchor="left",
+                    x=1.01
+                ),
+                margin=dict(l=20, r=20, t=50, b=20)
+            )
+            
+            # Improve text formatting
+            fig_dist.update_traces(
+                textposition='inside',
+                textinfo='percent+label',
+                textfont_size=11,
+                hovertemplate='<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percent}<extra></extra>'
+            )
+            
             st.plotly_chart(fig_dist, use_container_width=True)
             
             # Mood frequency over time
             mood_time_data = df_expanded.groupby([df_expanded['date'].dt.date, 'mood']).size().reset_index(name='count')
             mood_time_data['date'] = pd.to_datetime(mood_time_data['date'])
             
+            # Create the line chart with improved styling
             fig_trend = px.line(
                 mood_time_data,
                 x='date',
                 y='count',
                 color='mood',
-                title="Mood Frequency Over Time",
+                title="📈 Mood Frequency Over Time",
                 labels={'count': 'Number of Times Felt', 'date': 'Date'},
-                markers=True
+                markers=True,
+                color_discrete_map=mood_colors  # Use the same color scheme
             )
-            fig_trend.update_layout(height=400)
+            
+            # Improve styling
+            fig_trend.update_layout(
+                height=450,
+                font=dict(size=12),
+                title_font=dict(size=18, color="#2E86AB"),
+                xaxis=dict(
+                    title_font=dict(size=14, color="#2E86AB"),
+                    tickfont=dict(size=11),
+                    gridcolor='rgba(128,128,128,0.2)',
+                    showgrid=True
+                ),
+                yaxis=dict(
+                    title_font=dict(size=14, color="#2E86AB"),
+                    tickfont=dict(size=11),
+                    gridcolor='rgba(128,128,128,0.2)',
+                    showgrid=True
+                ),
+                legend=dict(
+                    orientation="v",
+                    yanchor="top",
+                    y=1,
+                    xanchor="left",
+                    x=1.01,
+                    font=dict(size=10)
+                ),
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                margin=dict(l=20, r=20, t=50, b=20)
+            )
+            
+            # Improve line and marker styling
+            fig_trend.update_traces(
+                line=dict(width=3),
+                marker=dict(size=8, line=dict(width=2, color='white')),
+                hovertemplate='<b>%{fullData.name}</b><br>Date: %{x}<br>Count: %{y}<extra></extra>'
+            )
+            
             st.plotly_chart(fig_trend, use_container_width=True)
             
             # Reasons analysis if available
@@ -369,14 +452,51 @@ else:
                     # Count reason frequency
                     reason_counts = pd.Series(all_reasons).value_counts().head(10)
                     
+                    # Create a beautiful gradient color scheme for the bar chart
+                    import numpy as np
+                    colors = px.colors.qualitative.Set3[:len(reason_counts)]
+                    
                     fig_reasons = px.bar(
                         x=reason_counts.values,
                         y=reason_counts.index,
                         orientation='h',
-                        title="Top 10 Reasons for Your Moods",
-                        labels={'x': 'Frequency', 'y': 'Reason'}
+                        title="🔍 Top 10 Reasons for Your Moods",
+                        labels={'x': 'Frequency', 'y': 'Reason'},
+                        color=reason_counts.values,
+                        color_continuous_scale='Viridis'
                     )
-                    fig_reasons.update_layout(height=400)
+                    
+                    # Improve styling
+                    fig_reasons.update_layout(
+                        height=450,
+                        font=dict(size=12),
+                        title_font=dict(size=18, color="#2E86AB"),
+                        xaxis=dict(
+                            title_font=dict(size=14, color="#2E86AB"),
+                            tickfont=dict(size=11),
+                            gridcolor='rgba(128,128,128,0.2)',
+                            showgrid=True
+                        ),
+                        yaxis=dict(
+                            title_font=dict(size=14, color="#2E86AB"),
+                            tickfont=dict(size=11),
+                            categoryorder='total ascending'
+                        ),
+                        plot_bgcolor='rgba(0,0,0,0)',
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        margin=dict(l=20, r=20, t=50, b=20),
+                        showlegend=False
+                    )
+                    
+                    # Improve bar styling
+                    fig_reasons.update_traces(
+                        hovertemplate='<b>%{y}</b><br>Frequency: %{x}<extra></extra>',
+                        marker=dict(
+                            line=dict(width=1, color='white'),
+                            opacity=0.8
+                        )
+                    )
+                    
                     st.plotly_chart(fig_reasons, use_container_width=True)
                     
                     # Show insights
@@ -413,6 +533,9 @@ else:
             
             # Handle multiple moods for stats
             if 'moods' in df.columns:
+                # Drop the old 'mood' column if it exists to avoid conflicts
+                if 'mood' in df.columns:
+                    df = df.drop(columns=['mood'])
                 df_expanded = df.explode('moods')
                 df_expanded = df_expanded.rename(columns={'moods': 'mood'})
             else:
@@ -428,7 +551,18 @@ else:
                 total_moods_today = len(today_moods)
                 st.metric("Moods Logged Today", total_moods_today)
                 
-                most_common_mood = today_moods['mood'].mode().iloc[0] if not today_moods['mood'].mode().empty else "No data"
+                # Get the most common mood, ensuring we get a scalar value
+                # First, clean the data by removing NaN values
+                clean_moods = today_moods['mood'].dropna()
+                if not clean_moods.empty:
+                    # Get the most common mood
+                    mode_result = clean_moods.mode()
+                    if not mode_result.empty:
+                        most_common_mood = mode_result.iloc[0]
+                    else:
+                        most_common_mood = "No data"
+                else:
+                    most_common_mood = "No data"
                 st.metric("Most Common Mood Today", most_common_mood)
             else:
                 st.metric("Moods Logged Today", "No data yet")

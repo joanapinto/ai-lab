@@ -266,8 +266,7 @@ if submitted:
 
     save_user_profile(user_profile)
     st.success("✅ Profile saved successfully!")
-    st.balloons()
-    
+        
     # Feedback prompt after onboarding completion
     st.write("---")
     st.subheader("🎉 Welcome to Humsy!")

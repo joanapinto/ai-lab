@@ -46,7 +46,7 @@ Comprehensive emotional wellness monitoring with persistent data storage:
 
 - **📊 Advanced Analytics**
   - **Mood distribution** - See which emotions you experience most
-  - **Mood frequency over time** - Track emotional patterns
+  - **Mood frequency over time** - Track emotional patterns with interactive bar charts
   - **Reasons analysis** - Understand what triggers each mood
   - **Mood-reason correlations** - Discover patterns in your emotional landscape
   - Interactive Plotly visualizations with enhanced insights
@@ -69,7 +69,7 @@ Comprehensive profile system for personalization:
 
 - **🎯 Editable Goals** - Update your main focus anytime
 - **📝 Onboarding Answers** - Review and edit your initial setup
-- **💬 Feedback Integration** - Direct access to feedback forms
+- **💬 Feedback Integration** - Direct access to feedback and bug report forms
 - **📋 Beta Tester Guide** - Comprehensive guide for new users
 - **🔧 Profile Statistics** - Track your wellness journey
 
@@ -120,7 +120,7 @@ Comprehensive tracking and visualization (formerly "History"):
 - **🎯 Quick Actions** - Easy access to daily check-in, mood logging, and weekly reflection
 - **🔐 Persistent Authentication** with "Remember me" functionality
 - **📊 Usage Tracking** with real-time AI usage statistics
-- **💬 Integrated Feedback System** for beta testing and improvements
+- **💬 Integrated Feedback System** - Easy access to feedback and bug report forms via sidebar navigation
 - **🧠 Intelligent Assistant** with personalized insights and recommendations
 - **🎯 Smart Recommendations** based on your patterns and preferences
 - **🤖 AI-Powered Greetings** with OpenAI integration for personalized responses
@@ -264,7 +264,7 @@ Focus Companion now includes AI-powered personalization using OpenAI's GPT-3.5-t
 - Personalized recommendations for your available time
 - Considers your recent mood patterns for relevant advice
 
-### **🚀 AI-Powered Task Planning** - **NEW FEATURE**
+### **🚀 AI-Powered Task Planning**
 - **Personalized Daily Plans** based on your energy, mood, and goals
 - **Deep Personalization** considering how you feel, what you need to do, and your motivations
 - **Overwhelm Prevention** with smart task breakdown strategies
@@ -292,7 +292,7 @@ Focus Companion now includes AI-powered personalization using OpenAI's GPT-3.5-t
 - **Smart fallback** - graceful degradation when limits are reached
 
 ### **📝 Beta Testing Features**
-- **Integrated feedback system** with Tally form integration
+- **Integrated feedback system** with Tally form integration for feedback and bug reports
 - **Persistent authentication** - no need to re-enter email
 - **Usage statistics** - real-time tracking of AI usage
 - **Contextual feedback prompts** - collected at optimal moments
@@ -398,6 +398,8 @@ All daily check-ins are automatically saved to `data/checkin_data.json` and pers
 - **🎨 UI/UX Overhaul**: Minimalist design with reduced clutter and improved aesthetics
 - **🏠 Streamlined Dashboard**: Cleaner home page focused on essential features
 - **📊 Page Restructuring**: Better information architecture and user flow
+- **🐛 Bug Report System**: Easy access to bug reporting via sidebar navigation
+- **📊 Improved Analytics**: Enhanced mood frequency charts with better visualization
 
 ### **💡 Key Improvements:**
 - **Better User Experience**: More intuitive navigation and cleaner interface

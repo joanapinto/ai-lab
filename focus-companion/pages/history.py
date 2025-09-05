@@ -66,6 +66,18 @@ with st.sidebar:
     
     st.write("---")
     
+    # Feedback section
+    st.subheader("💬 Feedback")
+    if st.button("📝 Give Feedback", use_container_width=True):
+        st.markdown("**[📋 Open Feedback Form](https://tally.so/r/mBr11Q)**")
+        st.info("Your feedback helps us make Humsy better for everyone! 🚀")
+    
+    if st.button("🐛 Report Bug", use_container_width=True):
+        st.markdown("**[🐛 Open Bug Report Form](https://tally.so/r/waR7Eq)**")
+        st.info("🐛 **Bug Report**\n\nPlease detail step by step how to reproduce the bug. Include:\n- What you were trying to do\n- What happened instead\n- Steps to reproduce")
+    
+    st.write("---")
+    
     # Admin insights access
     user_email = get_user_email()
     if user_email == "joanapnpinto@gmail.com":
@@ -238,8 +250,37 @@ else:
         st.header("😊 Mood Analytics")
         
         if mood_data:
+            # Process mood data to handle both old and new formats
+            processed_data = []
+            for entry in mood_data:
+                # Handle both old format (single mood) and new format (multiple moods)
+                if 'moods' in entry and entry['moods']:
+                    # New format: multiple moods
+                    for mood in entry['moods']:
+                        processed_entry = entry.copy()
+                        processed_entry['mood'] = mood
+                        # Remove the moods list to avoid confusion
+                        if 'moods' in processed_entry:
+                            del processed_entry['moods']
+                        # Set default intensity if not present
+                        if 'intensity' not in processed_entry:
+                            processed_entry['intensity'] = 5  # Default intensity
+                        processed_data.append(processed_entry)
+                elif 'mood' in entry:
+                    # Old format: single mood
+                    # Set default intensity if not present
+                    if 'intensity' not in entry:
+                        entry['intensity'] = 5  # Default intensity
+                    processed_data.append(entry)
+                else:
+                    # Fallback for malformed data
+                    processed_entry = entry.copy()
+                    processed_entry['mood'] = 'Unknown'
+                    processed_entry['intensity'] = 5
+                    processed_data.append(processed_entry)
+            
             # Convert to DataFrame for analysis
-            df = pd.DataFrame(mood_data)
+            df = pd.DataFrame(processed_data)
             df['timestamp'] = pd.to_datetime(df['timestamp'])
             df['date'] = pd.to_datetime(df['date'])
             df['hour'] = df['timestamp'].dt.hour
@@ -256,18 +297,87 @@ else:
             elif time_period == "Last 90 days":
                 cutoff_date = datetime.now() - timedelta(days=90)
                 df = df[df['timestamp'] >= cutoff_date]
+            # For "All time", no filtering is applied
             
             # Mood trend over time
             col1, col2 = st.columns(2)
             
             with col1:
-                st.subheader("📈 Mood Trend Over Time")
+                st.subheader("📈 Mood Frequency Over Time")
                 if not df.empty:
-                    fig = px.line(df, x='timestamp', y='intensity', 
-                                title='Mood Intensity Over Time',
-                                labels={'intensity': 'Mood Intensity', 'timestamp': 'Date'})
-                    fig.update_layout(height=400)
-                    st.plotly_chart(fig, use_container_width=True)
+                    # Create a beautiful line chart showing mood frequency over time
+                    mood_colors = {
+                        "😊 Happy": "#FFD700",      # Gold
+                        "😌 Calm": "#87CEEB",       # Sky Blue
+                        "😤 Stressed": "#FF6B6B",   # Coral Red
+                        "😴 Tired": "#9370DB",      # Medium Purple
+                        "😡 Angry": "#DC143C",      # Crimson
+                        "😔 Sad": "#4169E1",        # Royal Blue
+                        "😰 Anxious": "#FF8C00",    # Dark Orange
+                        "🤗 Excited": "#32CD32",    # Lime Green
+                        "😐 Neutral": "#808080",    # Gray
+                        "💪 Confident": "#FF1493",  # Deep Pink
+                        "😎 Confident": "#FF1493"   # Deep Pink (alternative spelling)
+                    }
+                    
+                    # Count mood frequency by date
+                    mood_time_data = df.groupby([df['date'].dt.date, 'mood']).size().reset_index(name='count')
+                    mood_time_data['date'] = pd.to_datetime(mood_time_data['date'])
+                    
+                    # Ensure we have data to plot
+                    if not mood_time_data.empty:
+                        # Ensure all moods have colors
+                        unique_moods = mood_time_data['mood'].unique()
+                        for mood in unique_moods:
+                            if mood not in mood_colors:
+                                mood_colors[mood] = "#CCCCCC"  # Default gray color
+                        
+                        # Use a bar chart instead of line chart for better visualization
+                        fig = px.bar(mood_time_data, x='date', y='count', color='mood',
+                                   title='📊 Mood Frequency Over Time',
+                                   labels={'count': 'Number of Times Felt', 'date': 'Date'},
+                                   color_discrete_map=mood_colors)
+                        
+                        fig.update_layout(
+                            height=450,
+                            font=dict(size=12),
+                            title_font=dict(size=18, color="#2E86AB"),
+                            xaxis=dict(
+                                title_font=dict(size=14, color="#2E86AB"),
+                                tickfont=dict(size=11),
+                                gridcolor='rgba(128,128,128,0.2)',
+                                showgrid=True
+                            ),
+                            yaxis=dict(
+                                title_font=dict(size=14, color="#2E86AB"),
+                                tickfont=dict(size=11),
+                                gridcolor='rgba(128,128,128,0.2)',
+                                showgrid=True
+                            ),
+                            legend=dict(
+                                orientation="v",
+                                yanchor="top",
+                                y=1,
+                                xanchor="left",
+                                x=1.01,
+                                font=dict(size=10)
+                            ),
+                            plot_bgcolor='rgba(0,0,0,0)',
+                            paper_bgcolor='rgba(0,0,0,0)',
+                            margin=dict(l=20, r=20, t=50, b=20)
+                        )
+                        
+                        fig.update_traces(
+                            hovertemplate='<b>%{fullData.name}</b><br>Date: %{x}<br>Count: %{y}<extra></extra>',
+                            marker=dict(
+                                line=dict(width=1, color='white'),
+                                opacity=0.8
+                            )
+                        )
+                        
+                        st.plotly_chart(fig, use_container_width=True)
+                    else:
+                        st.info("No mood data available for the selected time period.")
                 else:
                     st.info("No mood data available for the selected time period.")
             
@@ -275,9 +385,40 @@ else:
                 st.subheader("😊 Mood Distribution")
                 if not df.empty:
                     mood_counts = df['mood'].value_counts()
-                    fig = px.pie(values=mood_counts.values, names=mood_counts.index,
-                               title='Mood Distribution')
-                    fig.update_layout(height=400)
+                    
+                    # Create color list for the pie chart
+                    colors = [mood_colors.get(mood, "#CCCCCC") for mood in mood_counts.index]
+                    
+                    fig = px.pie(
+                        values=mood_counts.values,
+                        names=mood_counts.index,
+                        title="📊 Mood Distribution",
+                        color_discrete_sequence=colors,
+                        hole=0.3  # Create a donut chart
+                    )
+                    
+                    fig.update_layout(
+                        height=450,
+                        font=dict(size=12),
+                        title_font=dict(size=18, color="#2E86AB"),
+                        showlegend=True,
+                        legend=dict(
+                            orientation="v",
+                            yanchor="middle",
+                            y=0.5,
+                            xanchor="left",
+                            x=1.01
+                        ),
+                        margin=dict(l=20, r=20, t=50, b=20)
+                    )
+                    
+                    fig.update_traces(
+                        textposition='inside',
+                        textinfo='percent+label',
+                        textfont_size=11,
+                        hovertemplate='<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percent}<extra></extra>'
+                    )
+                    
                     st.plotly_chart(fig, use_container_width=True)
                 else:
                     st.info("No mood data available for the selected time period.")
@@ -291,10 +432,47 @@ else:
                     day_avg = df.groupby('day_of_week')['intensity'].mean().reindex([
                         'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
                     ])
-                    fig = px.bar(x=day_avg.index, y=day_avg.values,
-                               title='Average Mood by Day of Week',
-                               labels={'x': 'Day of Week', 'y': 'Average Mood Intensity'})
-                    fig.update_layout(height=400)
+                    
+                    # Create a beautiful bar chart
+                    fig = px.bar(
+                        x=day_avg.index, 
+                        y=day_avg.values,
+                        title='📅 Average Mood by Day of Week',
+                        labels={'x': 'Day of Week', 'y': 'Average Mood Intensity'},
+                        color=day_avg.values,
+                        color_continuous_scale='Viridis'
+                    )
+                    
+                    fig.update_layout(
+                        height=450,
+                        font=dict(size=12),
+                        title_font=dict(size=18, color="#2E86AB"),
+                        xaxis=dict(
+                            title_font=dict(size=14, color="#2E86AB"),
+                            tickfont=dict(size=11),
+                            gridcolor='rgba(128,128,128,0.2)',
+                            showgrid=True
+                        ),
+                        yaxis=dict(
+                            title_font=dict(size=14, color="#2E86AB"),
+                            tickfont=dict(size=11),
+                            gridcolor='rgba(128,128,128,0.2)',
+                            showgrid=True
+                        ),
+                        plot_bgcolor='rgba(0,0,0,0)',
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        margin=dict(l=20, r=20, t=50, b=20),
+                        showlegend=False
+                    )
+                    
+                    fig.update_traces(
+                        hovertemplate='<b>%{x}</b><br>Average Intensity: %{y:.1f}/10<extra></extra>',
+                        marker=dict(
+                            line=dict(width=1, color='white'),
+                            opacity=0.8
+                        )
+                    )
+                    
                     st.plotly_chart(fig, use_container_width=True)
                 else:
                     st.info("No mood data available for the selected time period.")
@@ -303,10 +481,48 @@ else:
                 st.subheader("🕐 Mood by Time of Day")
                 if not df.empty:
                     hour_avg = df.groupby('hour')['intensity'].mean()
-                    fig = px.bar(x=hour_avg.index, y=hour_avg.values,
-                               title='Average Mood by Hour of Day',
-                               labels={'x': 'Hour of Day', 'y': 'Average Mood Intensity'})
-                    fig.update_layout(height=400)
+                    
+                    # Create a beautiful bar chart for time of day
+                    fig = px.bar(
+                        x=hour_avg.index, 
+                        y=hour_avg.values,
+                        title='🕐 Average Mood by Hour of Day',
+                        labels={'x': 'Hour of Day', 'y': 'Average Mood Intensity'},
+                        color=hour_avg.values,
+                        color_continuous_scale='Plasma'
+                    )
+                    
+                    fig.update_layout(
+                        height=450,
+                        font=dict(size=12),
+                        title_font=dict(size=18, color="#2E86AB"),
+                        xaxis=dict(
+                            title_font=dict(size=14, color="#2E86AB"),
+                            tickfont=dict(size=11),
+                            gridcolor='rgba(128,128,128,0.2)',
+                            showgrid=True,
+                            dtick=2  # Show every 2 hours
+                        ),
+                        yaxis=dict(
+                            title_font=dict(size=14, color="#2E86AB"),
+                            tickfont=dict(size=11),
+                            gridcolor='rgba(128,128,128,0.2)',
+                            showgrid=True
+                        ),
+                        plot_bgcolor='rgba(0,0,0,0)',
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        margin=dict(l=20, r=20, t=50, b=20),
+                        showlegend=False
+                    )
+                    
+                    fig.update_traces(
+                        hovertemplate='<b>%{x}:00</b><br>Average Intensity: %{y:.1f}/10<extra></extra>',
+                        marker=dict(
+                            line=dict(width=1, color='white'),
+                            opacity=0.8
+                        )
+                    )
+                    
                     st.plotly_chart(fig, use_container_width=True)
                 else:
                     st.info("No mood data available for the selected time period.")

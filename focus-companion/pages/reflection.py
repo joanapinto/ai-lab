@@ -102,4 +102,3 @@ else:
         
         if submitted:
             st.success("✅ Reflection saved successfully!")
-            st.balloons()

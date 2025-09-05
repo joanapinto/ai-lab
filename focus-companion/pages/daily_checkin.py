@@ -273,7 +273,6 @@ else:
                 st.success("✅ Morning check-in saved successfully!")
                 
                 # Completion celebration
-                st.balloons()
                 st.success("🎉 **Check-in Complete!** You've successfully completed your morning check-in!")
                 
                 # Show completion summary
@@ -355,8 +354,6 @@ else:
                     checkin_data['task_plan'] = task_plan
                     checkin_data['task_completion'] = task_completion
                     save_checkin_data(checkin_data)
-                
-                st.balloons()
         
         # Afternoon flow (12 PM - 6 PM)
         elif 12 <= current_hour < 18:
@@ -471,7 +468,6 @@ else:
                 st.success("✅ Afternoon check-in saved successfully!")
                 
                 # Completion celebration
-                st.balloons()
                 st.success("🎉 **Check-in Complete!** You've successfully completed your afternoon check-in!")
                 
                 # Show completion summary
@@ -540,8 +536,6 @@ else:
                     checkin_data['task_plan'] = task_plan
                     checkin_data['task_completion'] = task_completion
                     save_checkin_data(checkin_data)
-                
-                st.balloons()
         
         # Evening flow (6 PM - 5 AM)
         else:
@@ -657,7 +651,6 @@ else:
                 st.success("✅ Evening check-in saved successfully!")
                 
                 # Completion celebration
-                st.balloons()
                 st.success("🎉 **Check-in Complete!** You've successfully completed your evening check-in!")
                 
                 # Show completion summary
@@ -726,5 +719,3 @@ else:
                     checkin_data['task_plan'] = task_plan
                     checkin_data['task_completion'] = task_completion
                     save_checkin_data(checkin_data)
-                
-                st.balloons()
