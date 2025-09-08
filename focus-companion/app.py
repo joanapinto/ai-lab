@@ -56,7 +56,6 @@ require_beta_access()
 
 def show_onboarding_flow():
     """Show the integrated onboarding flow with steps"""
-    st.title("🧠 Welcome to Humsy!")
     st.success("🎉 **Welcome to Humsy Beta!**")
     st.info("💡 **Pro Tip:** Take your time with these questions - they help the AI provide personalized insights!")
     
