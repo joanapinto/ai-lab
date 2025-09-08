@@ -246,7 +246,7 @@ class AIService:
         prompt = PromptTemplates.productivity_insights_prompt(all_data)
         
         # Add specific tip instructions
-        prompt += "\n\nPlease provide one specific, actionable productivity tip that considers their current situation and energy drainers. Keep it practical and implementable."
+        prompt += "\n\nPlease provide ONE specific, actionable productivity tip that considers their current situation and energy drainers. Keep it practical, implementable, and concise (2-3 sentences max)."
         
         try:
             # Show enhanced loading feedback
@@ -254,10 +254,10 @@ class AIService:
                 response = self.client.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[
-                        {"role": "system", "content": "You are a productivity expert providing practical, personalized advice."},
+                        {"role": "system", "content": "You are a productivity expert providing practical, personalized advice. Keep responses concise and actionable."},
                         {"role": "user", "content": prompt}
                 ],
-                    max_tokens=60,
+                    max_tokens=150,
                     temperature=0.7
                 )
             

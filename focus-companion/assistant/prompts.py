@@ -131,16 +131,15 @@ class PromptTemplates:
     def productivity_insights_prompt(all_data: Dict) -> str:
         """Generate prompt for productivity insights"""
         return f"""
-        Complete User Data: {all_data}
+        User Context: {all_data}
         
-        Provide comprehensive productivity insights:
-        1. Identify peak productivity times
-        2. Suggest workflow optimizations
-        3. Recommend focus techniques
-        4. Address productivity blockers
-        5. Suggest habit improvements
+        Based on this user's profile, mood patterns, and check-in data, provide ONE specific productivity tip that:
+        - Addresses their current situation and energy drainers
+        - Is practical and immediately actionable
+        - Considers their availability and preferences
+        - Helps them work toward their goals more effectively
         
-        Base insights on actual user patterns and preferences.
+        Keep the response focused and concise.
         """
     
     @staticmethod

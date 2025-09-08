@@ -13,6 +13,7 @@ sys.path.insert(0, str(project_root))
 
 from data.storage import save_user_profile, load_user_profile, save_checkin_data, load_checkin_data, load_mood_data
 from assistant.fallback import FallbackAssistant
+from assistant.ai_service import AIService
 from auth import require_beta_access, get_user_email
 
 st.set_page_config(page_title="Humsy - Daily Check-in", page_icon="📝")
@@ -79,6 +80,72 @@ with st.sidebar:
 
 # Require beta access
 require_beta_access()
+
+def generate_checkin_analysis(user_profile, checkin_data, mood_data, time_period):
+    """Generate AI-powered analysis of the check-in against user's goal and patterns"""
+    try:
+        # Initialize AI service
+        ai_service = AIService()
+        user_email = get_user_email()
+        
+        # Get recent patterns (last 7 days)
+        recent_checkins = [c for c in checkin_data if (datetime.now() - datetime.fromisoformat(c['timestamp'])).days <= 7]
+        recent_moods = [m for m in mood_data if (datetime.now() - datetime.fromisoformat(m['timestamp'])).days <= 7]
+        
+        # Prepare context for AI analysis
+        context = {
+            "user_goal": user_profile.get('goal', 'Not specified'),
+            "user_tone": user_profile.get('tone', 'Gentle & Supportive'),
+            "user_situation": user_profile.get('situation', 'Not specified'),
+            "time_period": time_period,
+            "current_checkin": checkin_data[-1] if checkin_data else {},
+            "recent_patterns": {
+                "checkins_count": len(recent_checkins),
+                "moods_count": len(recent_moods),
+                "energy_levels": [c.get('energy_level', 'Unknown') for c in recent_checkins if 'energy_level' in c],
+                "focus_areas": [c.get('focus_today', '') for c in recent_checkins if 'focus_today' in c],
+                "accomplishments": [c.get('accomplishments', '') for c in recent_checkins if 'accomplishments' in c]
+            }
+        }
+        
+        # Create the analysis prompt
+        prompt = f"""
+You are a compassionate productivity coach analyzing a user's daily check-in. Your role is to provide emotional support while offering deep insights that help them align with their goals.
+
+USER CONTEXT:
+- Main Goal: {context['user_goal']}
+- Communication Style: {context['user_tone']}
+- Situation: {context['user_situation']}
+- Check-in Time: {context['time_period']}
+
+CURRENT CHECK-IN:
+{context['current_checkin']}
+
+RECENT PATTERNS (Last 7 days):
+- Check-ins: {context['recent_patterns']['checkins_count']} entries
+- Moods tracked: {context['recent_patterns']['moods_count']} entries
+- Energy levels: {', '.join(context['recent_patterns']['energy_levels'][:3])}
+- Focus areas: {', '.join(context['recent_patterns']['focus_areas'][:3])}
+- Accomplishments: {', '.join(context['recent_patterns']['accomplishments'][:3])}
+
+ANALYSIS REQUEST:
+Provide a personalized analysis that:
+1. Acknowledges their current state with empathy
+2. Connects their check-in to their main goal
+3. Identifies patterns and opportunities for improvement
+4. Offers specific, actionable suggestions
+5. Maintains their preferred communication tone
+
+Be warm, understanding, and deeply insightful. Focus on productivity and goal alignment while being emotionally supportive.
+"""
+        
+        # Generate the analysis
+        analysis = ai_service.generate_response(prompt, user_email)
+        return analysis
+        
+    except Exception as e:
+        # Fallback to a simple analysis if AI fails
+        return f"Thank you for your {time_period} check-in! Your goal is to {user_profile.get('goal', 'improve your focus and productivity')}. Keep tracking your progress - every check-in brings you closer to your goals! 💪"
 
 st.title("📝 Daily Check-in")
 
@@ -288,6 +355,13 @@ else:
                     if additional_notes:
                         st.write(f"**Notes:** {additional_notes[:50]}{'...' if len(additional_notes) > 50 else ''}")
                 
+                # AI Analysis
+                st.write("---")
+                st.subheader("🤖 Personalized Insights")
+                with st.spinner("🧠 Analyzing your check-in against your goals and patterns..."):
+                    analysis = generate_checkin_analysis(user_profile, checkin_data, mood_data, "morning")
+                    st.write(analysis)
+                
                 # Feedback prompt after successful check-in
                 st.write("---")
                 st.info("💬 **How was this check-in experience?**")
@@ -484,6 +558,13 @@ else:
                     if additional_notes:
                         st.write(f"**Notes:** {additional_notes[:50]}{'...' if len(additional_notes) > 50 else ''}")
                 
+                # AI Analysis
+                st.write("---")
+                st.subheader("🤖 Personalized Insights")
+                with st.spinner("🧠 Analyzing your progress against your goals and patterns..."):
+                    analysis = generate_checkin_analysis(user_profile, checkin_data, mood_data, "afternoon")
+                    st.write(analysis)
+                
                 # Generate smart task plan if user requested help
                 if checkin_mode == "🎯 Get help planning my day":
                     st.subheader("🎯 Your Smart Afternoon Plan")
@@ -666,6 +747,13 @@ else:
                         st.write(f"**Challenges:** {challenges[:50]}{'...' if len(challenges) > 50 else ''}")
                     if tomorrow_focus:
                         st.write(f"**Tomorrow's Focus:** {tomorrow_focus[:50]}{'...' if len(tomorrow_focus) > 50 else ''}")
+                
+                # AI Analysis
+                st.write("---")
+                st.subheader("🤖 Personalized Insights")
+                with st.spinner("🧠 Analyzing your day against your goals and patterns..."):
+                    analysis = generate_checkin_analysis(user_profile, checkin_data, mood_data, "evening")
+                    st.write(analysis)
                 
                 # Generate smart task plan if user requested help
                 if checkin_mode == "🎯 Get help planning my day":

@@ -253,10 +253,11 @@ def main():
         ### 🚀 **Beta Tester Guide**
         
         **🎯 Quick Start:**
-        1. **Start with a morning check-in** - It's the heart of the app!
-        2. **Track your mood** - Build patterns and insights
-        3. **Try the AI features** - Personalized greetings and tips
-        4. **Explore weekly reflections** - Learn from your patterns
+        1. **Complete your onboarding** - Set your goals and preferences first!
+        2. **Start with a time-aware check-in** - Morning, afternoon, or evening based on current time
+        3. **Track your mood** - Build patterns and insights
+        4. **Try the AI features** - Personalized analysis and tips
+        5. **Explore weekly reflections** - Learn from your patterns
         
         **💡 Pro Tips:**
         - **Be consistent** - Daily check-ins build the most valuable insights

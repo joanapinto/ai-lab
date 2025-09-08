@@ -181,10 +181,10 @@ Comprehensive tracking and visualization (formerly "History"):
 - **📊 Insights**: Comprehensive analytics and mood patterns (formerly History)
 
 ### Daily Usage
-1. **Morning Check-in**: Start your day with sleep, energy, and focus assessment
-2. **Afternoon Review**: Mid-day progress check and plan adjustments
-3. **Evening Reflection**: End-of-day accomplishment review and tomorrow's planning
-4. **Mood Tracking**: Log your emotions with the beautiful new form above graphs
+1. **Time-Aware Check-ins**: Morning (5 AM-12 PM), Afternoon (12 PM-6 PM), or Evening (6 PM-5 AM) based on current time
+2. **AI-Powered Analysis**: Each check-in gets personalized insights based on your goals and patterns
+3. **Mood Tracking**: Log your emotions with the beautiful new form above graphs
+4. **Smart Task Planning**: AI generates personalized daily plans based on your energy and goals
 5. **Data Persistence**: All your data is automatically saved and persists across sessions
 
 ### Weekly Review
@@ -249,10 +249,11 @@ focus-companion/
 
 Focus Companion now includes AI-powered personalization using OpenAI's GPT-3.5-turbo:
 
-### **🎯 AI-Powered Greetings**
-- Personalized greetings based on your mood, energy, and recent patterns
-- Context-aware responses that consider your goals and preferences
-- Time-of-day awareness for relevant messaging
+### **🎯 AI-Powered Check-in Analysis**
+- Personalized insights after each check-in based on your goals and patterns
+- Analysis of your progress against your main objectives
+- Suggestions for improvement and better goal alignment
+- Emotional and understanding tone that goes deep into what you want to achieve
 
 ### **💬 Daily Encouragement**
 - AI-generated motivational messages tailored to your situation
@@ -319,6 +320,7 @@ Focus Companion now includes AI-powered personalization using OpenAI's GPT-3.5-t
 - **Enhanced Loading Animations** - Beautiful progress indicators for AI responses
 - **AI-Powered Task Planning** - Personalized daily plans based on energy, mood, and goals
 - **Enhanced AI Prompts** - Comprehensive task planning prompts with deep personalization
+- **AI Check-in Analysis** - Personalized insights after each check-in with goal alignment analysis
 
 For setup instructions, see [AI_SETUP.md](AI_SETUP.md).
 
@@ -400,6 +402,8 @@ All daily check-ins are automatically saved to `data/checkin_data.json` and pers
 - **📊 Page Restructuring**: Better information architecture and user flow
 - **🐛 Bug Report System**: Easy access to bug reporting via sidebar navigation
 - **📊 Improved Analytics**: Enhanced mood frequency charts with better visualization
+- **🤖 AI-Powered Check-in Analysis**: Personalized insights after each check-in based on your goals and patterns
+- **🎯 Integrated Onboarding**: Multi-step onboarding flow that appears on first login
 
 ### **💡 Key Improvements:**
 - **Better User Experience**: More intuitive navigation and cleaner interface
@@ -407,6 +411,8 @@ All daily check-ins are automatically saved to `data/checkin_data.json` and pers
 - **Improved Profile Management**: Easy access to edit goals and review onboarding
 - **Consistent Design**: Unified styling across all pages and components
 - **Mobile-First Approach**: Better responsive design for all devices
+- **AI-Powered Insights**: Personalized analysis after each check-in based on user goals and patterns
+- **Seamless Onboarding**: Integrated multi-step setup that guides new users through goal setting
 
 ---
 

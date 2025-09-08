@@ -363,17 +363,19 @@ def main():
                 You're among the first to try Humsy! Here's how to get the most value:
                 
                 **🎯 Quick Start:**
-                1. **Start with a morning check-in** - It's the heart of the app!
-                2. **Track your mood** - Enhanced mood tracking with multiple emotions and reasons
-                3. **Try the AI features** - Personalized greetings and smart task planning
-                4. **Explore weekly reflections** - Learn from your patterns
-                5. **Use the sidebar navigation** - Easy access to all features
+                1. **Complete your onboarding** - Set your goals and preferences first!
+                2. **Start with a time-aware check-in** - Morning, afternoon, or evening based on current time
+                3. **Track your mood** - Enhanced mood tracking with multiple emotions and reasons
+                4. **Try the AI features** - Personalized insights and smart analysis
+                5. **Explore weekly reflections** - Learn from your patterns
+                6. **Use the sidebar navigation** - Easy access to all features
                 
                 **💡 Pro Tips:**
+                - **Set clear goals first** - The AI uses your goals to provide better insights
                 - **Be consistent** - Daily check-ins build the most valuable insights
                 - **Track multiple moods** - You can feel happy AND calm at the same time!
                 - **Add reasons for your moods** - Helps identify patterns and triggers
-                - **Use the AI features** - They get smarter with your data
+                - **Use the AI features** - They get smarter with your data and provide personalized analysis
                 - **Don't worry about perfection** - Just log how you're feeling
                 
                 **😊 Enhanced Mood Tracking:**
@@ -383,9 +385,10 @@ def main():
                 - **Smart insights** - AI-powered mood analysis and recommendations
                 
                 **🤖 AI Features:**
-                - **Personalized greetings** - AI that knows your patterns and mood trends
+                - **Personalized check-in analysis** - AI analyzes your check-ins against your goals and patterns
                 - **Smart task planning** - Based on your energy, mood, and goals
                 - **Mood analysis** - Insights into your emotional patterns
+                - **Daily productivity tips** - Personalized advice based on your data
                 - **Usage limits** - 20 AI calls per day, 400 per month
                 - **Graceful fallback** - Works perfectly even without AI
                 
@@ -404,7 +407,7 @@ def main():
                 - **AI features** have usage limits to control costs
                 - **Data is saved locally** - your privacy is protected
                 - **Updates** will add new features based on your feedback
-                - **Recent improvements** - Fixed data compatibility and enhanced mood tracking
+                - **Recent improvements** - AI-powered check-in analysis, integrated onboarding, and enhanced mood tracking
                 
                 **🎁 Beta Perks:**
                 - **Early access** to new features
@@ -418,7 +421,7 @@ def main():
                 st.markdown("### 🚀 Ready to get started?")
                 col1, col2, col3 = st.columns(3)
                 with col1:
-                    if st.button("📝 Start Morning Check-in", use_container_width=True, type="primary"):
+                    if st.button("📝 Start Daily Check-in", use_container_width=True, type="primary"):
                         st.switch_page("pages/daily_checkin.py")
                 with col2:
                     if st.button("😊 Track My Mood", use_container_width=True):
@@ -533,16 +536,14 @@ def main():
         with col1:
             encouragement = assistant.get_daily_encouragement()
             if encouragement:
-                st.info(f"💬 **Encouragement:** {encouragement}")
+                st.markdown("💬 **Encouragement:**")
+                st.write(encouragement)
         
         with col2:
             tip = assistant.get_productivity_tip()
             if tip:
-                st.info(f"💡 **Today's Tip:** {tip}")
-                # Add expander for longer tips
-                if len(tip) > 100:
-                    with st.expander("📖 Read full tip"):
-                        st.write(tip)
+                st.markdown("💡 **Today's Tip:**")
+                st.write(tip)
         
         # Daily reminder right after insights
         st.write("---")

@@ -12,6 +12,13 @@ sys.path.insert(0, str(project_root))
 from data.storage import save_user_profile, load_user_profile, reset_user_profile
 from auth import require_beta_access, get_user_email
 
+def safe_index(value, options, default=0):
+    """Safely get the index of a value in a list, with fallback to default"""
+    try:
+        return options.index(value)
+    except ValueError:
+        return default
+
 st.set_page_config(page_title="Humsy - Onboarding", page_icon="🧠")
 
 # Hide Streamlit's default navigation
@@ -169,7 +176,7 @@ st.subheader("💬 Professional support")
 therapy_coaching = st.selectbox(
     "💬 Are you currently working with a therapist, coach, or mentor?",
     options=["No", "Yes", "I'd like to find one"],
-    index=["No", "Yes", "I'd like to find one"].index(therapy_coaching)
+    index=safe_index(therapy_coaching, ["No", "Yes", "I'd like to find one"])
 )
 
 st.subheader("⏱️ Time and energy assessment")
@@ -178,14 +185,14 @@ st.subheader("⏱️ Time and energy assessment")
 availability = st.selectbox(
     "⏱️ On most weekdays, how much time do you feel you can dedicate to yourself or your goals?",
     options=["< 1 hour", "1–2 hours", "2–4 hours", "4+ hours"],
-    index=["< 1 hour", "1–2 hours", "2–4 hours", "4+ hours"].index(availability)
+    index=safe_index(availability, ["< 1 hour", "1–2 hours", "2–4 hours", "4+ hours"])
 )
 
 # Question 6: Current energy levels
 energy = st.selectbox(
     "🔋 How would you describe your current energy levels?",
     options=["Very low", "Low", "Okay", "Good", "High"],
-    index=["Very low", "Low", "Okay", "Good", "High"].index(energy)
+    index=safe_index(energy, ["Very low", "Low", "Okay", "Good", "High"])
 )
 
 # Conditional questions for low energy
@@ -196,7 +203,7 @@ if energy in ["Low", "Very low"]:
     emotional_patterns = st.selectbox(
         "🧠 Do you want help understanding emotional patterns over time?",
         options=["Yes", "No", "Not sure yet"],
-        index=["Yes", "No", "Not sure yet"].index(emotional_patterns)
+        index=safe_index(emotional_patterns, ["Yes", "No", "Not sure yet"])
     )
     
     # Question 6.2: Small habit building
@@ -212,14 +219,14 @@ st.subheader("🔔 Assistant preferences")
 reminders = st.selectbox(
     "🔔 Would you like gentle reminders or check-in nudges from your assistant?",
     options=["Yes", "No"],
-    index=["Yes", "No"].index(reminders)
+    index=safe_index(reminders, ["Yes", "No"])
 )
 
 # Question 8: Communication tone
 tone = st.selectbox(
     "🗣️ How would you like your assistant to speak to you?",
     options=["Direct & Motivating", "Gentle & Supportive", "Neutral & Balanced"],
-    index=["Direct & Motivating", "Gentle & Supportive", "Neutral & Balanced"].index(tone)
+    index=safe_index(tone, ["Direct & Motivating", "Gentle & Supportive", "Neutral & Balanced"])
 )
 
 st.subheader("💼 Your situation")
@@ -228,7 +235,7 @@ st.subheader("💼 Your situation")
 situation = st.selectbox(
     "💼 Which of these best describes your current situation?",
     options=["Freelancer", "New parent", "PhD student", "Full-time job", "Unemployed", "Other"],
-    index=["Freelancer", "New parent", "PhD student", "Full-time job", "Unemployed", "Other"].index(situation)
+    index=safe_index(situation, ["Freelancer", "New parent", "PhD student", "Full-time job", "Unemployed", "Other"])
 )
 
 # Conditional "Other" specification for situation

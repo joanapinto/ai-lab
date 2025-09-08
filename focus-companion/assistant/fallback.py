@@ -120,12 +120,16 @@ class FallbackAssistant:
             pass
         
         # Try AI first
-        ai_tip = self.ai_service.generate_productivity_tip(
-            self.user_profile, self.mood_data, self.checkin_data, user_email
-        )
-        
-        if ai_tip:
-            return ai_tip
+        try:
+            ai_tip = self.ai_service.generate_productivity_tip(
+                self.user_profile, self.mood_data, self.checkin_data, user_email
+            )
+            
+            if ai_tip and len(ai_tip.strip()) > 10:  # Ensure we have a meaningful tip
+                return ai_tip
+        except Exception as e:
+            # If AI fails, fall back to rule-based tips
+            pass
         
         # Fallback to rule-based tips
         tips = [
