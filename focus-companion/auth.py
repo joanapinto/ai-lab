@@ -8,14 +8,27 @@ import json
 import os
 from pathlib import Path
 
-# Load allowed emails from file
+# Load allowed emails from Streamlit secrets
 def load_whitelist():
-    """Load the list of allowed email addresses"""
+    """Load the list of allowed email addresses from Streamlit secrets"""
     try:
-        with open("data/allowed_emails.txt", "r") as f:
-            return [line.strip().lower() for line in f.readlines()]
-    except FileNotFoundError:
-        # If no whitelist file exists, return empty list (no access)
+        # Get allowed emails from Streamlit secrets
+        allowed_emails = st.secrets.get("allowed_emails", [])
+        
+        # Ensure it's a list and convert to lowercase
+        if isinstance(allowed_emails, str):
+            # If it's a single string, split by comma or newline
+            allowed_emails = [email.strip().lower() for email in allowed_emails.replace('\n', ',').split(',') if email.strip()]
+        elif isinstance(allowed_emails, list):
+            # If it's already a list, convert to lowercase
+            allowed_emails = [email.strip().lower() for email in allowed_emails if email.strip()]
+        else:
+            # If it's not a string or list, return empty list
+            allowed_emails = []
+        
+        return allowed_emails
+    except Exception:
+        # If secrets are not configured or there's an error, return empty list (no access)
         return []
 
 def save_user_session(email: str, remember_me: bool = False):

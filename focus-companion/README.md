@@ -199,6 +199,8 @@ Comprehensive tracking and visualization (formerly "History"):
 focus-companion/
 ├── app.py                 # Main Streamlit application
 ├── auth.py                # Beta access control & authentication
+├── .streamlit/            # Streamlit configuration
+│   └── secrets.toml       # Secure configuration (allowed emails, API keys)
 ├── pages/                 # Application pages
 │   ├── profile.py         # NEW: User profile management & editing
 │   ├── onboarding.py      # User profile setup with feedback
@@ -244,6 +246,35 @@ focus-companion/
 - **Authentication**: Custom beta access control with persistent sessions
 - **Usage Tracking**: SQLite-based usage monitoring with detailed analytics
 - **Feedback Integration**: Tally form integration for beta testing
+
+## ⚙️ Configuration
+
+### **🔐 Streamlit Secrets**
+Humsy uses Streamlit secrets for secure configuration management. Create a `.streamlit/secrets.toml` file in your project root:
+
+```toml
+# Allowed email addresses for beta access
+allowed_emails = [
+    "your-email@example.com",
+    "another-email@example.com"
+]
+
+# OpenAI API Key (optional - can also use environment variables)
+openai_api_key = "your-openai-api-key-here"
+```
+
+### **📧 Beta Access Management**
+- **Add users**: Add email addresses to the `allowed_emails` list in `secrets.toml`
+- **Remove users**: Remove email addresses from the `allowed_emails` list
+- **Admin access**: The first email in the list gets admin privileges
+- **Security**: Secrets are encrypted and not exposed in the app interface
+
+### **🔑 Environment Variables** (Alternative)
+You can also use environment variables instead of secrets:
+```bash
+export OPENAI_API_KEY="your-openai-api-key"
+export ALLOWED_EMAILS="email1@example.com,email2@example.com"
+```
 
 ## 🤖 AI Features
 
